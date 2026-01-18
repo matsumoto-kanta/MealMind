@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
+import { ThemeProvider } from 'next-themes'
 
 const geist = Geist({
   variable: '--font-geist',
@@ -18,11 +19,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body
-        className={` ${geist.variable} bg-[#f5f5f7] text-[#1d1d1f] antialiased min-h-screen`}
+        className={`${geist.variable} text-foreground antialiased bg-[#F5F5F7] dark:bg-[#1E1E1E]`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <div className="mx-auto min-h-screen max-w-107.5 bg-background shadow">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )
