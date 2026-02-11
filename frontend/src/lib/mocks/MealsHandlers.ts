@@ -1,7 +1,7 @@
 import { MealData } from '@/types/Meal'
 import { http, HttpResponse } from 'msw'
 
-const API_BASE_URL = 'http://localhost:3000/api'
+const API_BASE_URL = process.env.API_BASE_URL
 
 const meals: MealData = {
   status: 'fixed',
