@@ -6,8 +6,13 @@ import Dashboard from './dashboard/components/Dashboard'
 import History from './history/components/History'
 import Budget from './budget/components/Budget'
 import Settings from './settings/components/Settings'
+import { MealData } from '@/types/Meal'
 
-export default function Main() {
+interface MainProps {
+  meals: MealData
+}
+
+export default function Main({ meals }: MainProps) {
   const tab = useAtomValue(tabAtom)
 
   return (
@@ -19,7 +24,7 @@ export default function Main() {
       ) : tab === 'settings' ? (
         <Settings />
       ) : (
-        <Dashboard />
+        <Dashboard meals={meals} />
       )}
     </>
   )

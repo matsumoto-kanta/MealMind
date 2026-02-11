@@ -1,5 +1,5 @@
 // APIモックサーバー
 
-import { emailHandlers } from './EmailHandlers'
+import { mealsHandlers } from './MealsHandlers'
 
-export const handlers = [...emailHandlers]
+export const handlers = [...mealsHandlers]

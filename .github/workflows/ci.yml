@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  API_BASE_URL: "http://localhost:3000/api"
+  MSW_ENABLED: "true"
+
 on:
   push:
     branches:

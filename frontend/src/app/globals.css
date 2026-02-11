@@ -54,7 +54,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #0066ff;
   --primary-foreground: #0066ff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: #8b8b94;
@@ -62,7 +62,8 @@
   --muted-foreground: #7e848d;
   --accent: oklch(0.97 0 0);
   --accent-foreground: #ffffff;
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #ff3f60;
+  --destructive-foreground: #ff3f60;
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -88,7 +89,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: #0066ff;
   --primary-foreground: #0066ff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: #8b8b94;
@@ -96,7 +97,8 @@
   --muted-foreground: #7e848d;
   --accent: oklch(0.97 0 0);
   --accent-foreground: #ffffff;
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #ff3f60;
+  --destructive-foreground: #ff3f60;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -122,4 +124,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* スクロールバー非表示 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

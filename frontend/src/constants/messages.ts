@@ -23,6 +23,9 @@ export const messages = {
       budget: '予算',
       settings: '設定',
     },
+    unit: {
+      yen: '円',
+    },
   },
   auth: {
     email: 'メールアドレス',
@@ -51,5 +54,20 @@ export const messages = {
   resetPassword: {
     resetPassword: 'パスワードの再設定',
     save: '保存',
+  },
+  dashboard: {
+    todayMenu: '今日の献立',
+    morning: '朝ごはん',
+    lunch: '昼ごはん',
+    dinner: '夜ごはん',
+    kcal: 'kcal',
+    protein: 'タンパク質',
+    fat: '脂質',
+    carbohydrates: '炭水化物',
+    regeneration: '再生成',
+    confirmed: '確定',
+    shoppingList: '買い物リスト',
+    edit: '編集',
+    done: '完了',
   },
 }

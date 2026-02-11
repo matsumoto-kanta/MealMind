@@ -1,5 +1,5 @@
-import Main from '@/feature/Main'
+import MainData from '@/feature/MainData'
 
 export default function Page() {
-  return <Main />
+  return <MainData />
 }
