@@ -31,12 +31,12 @@ export default function MainLayout({
       <div className="relative min-h-screen">
         <div className="px-5">
           {/* タイトル */}
-          <header className="sticky top-0 z-5">
+          <header className="sticky top-0 z-5 bg-background">
             <h1 className="text-[24px] font-semibold pt-13.5 pb-7">{title}</h1>
           </header>
 
           {/* メインコンテンツ */}
-          <main>{children}</main>
+          <main className="pb-21.5">{children}</main>
         </div>
 
         {/* タブバー */}

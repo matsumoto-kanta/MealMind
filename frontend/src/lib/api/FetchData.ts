@@ -74,9 +74,7 @@ export async function fetchData(
         : JSON.stringify(options.body)
     }
 
-    console.log('fetchData', fetchOptions)
     const response = await fetch(url.toString(), fetchOptions)
-    console.log('response', response)
 
     if (!response.ok) {
       if (response.status === ERROR_STATUS.UNAUTHORIZED) {
