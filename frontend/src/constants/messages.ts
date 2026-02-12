@@ -57,7 +57,7 @@ export const messages = {
   },
   dashboard: {
     todayMenu: '今日の献立',
-    morning: '朝ごはん',
+    breakfast: '朝ごはん',
     lunch: '昼ごはん',
     dinner: '夜ごはん',
     kcal: 'kcal',

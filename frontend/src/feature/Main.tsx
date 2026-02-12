@@ -10,15 +10,16 @@ import { MealData } from '@/types/Meal'
 
 interface MainProps {
   meals: MealData
+  history: MealData[]
 }
 
-export default function Main({ meals }: MainProps) {
+export default function Main({ meals, history }: MainProps) {
   const tab = useAtomValue(tabAtom)
 
   return (
     <>
       {tab === 'history' ? (
-        <History />
+        <History history={history} />
       ) : tab === 'budget' ? (
         <Budget />
       ) : tab === 'settings' ? (

@@ -8,7 +8,6 @@ const meals: MealData = {
   detail: [
     {
       id: 'breakfast',
-      type: 'morning',
       name: '高タンパク和風オムレツ定食',
       kcal: 32,
       protein: 18,
@@ -25,7 +24,6 @@ const meals: MealData = {
     },
     {
       id: 'lunch',
-      type: 'lunch',
       name: '鶏むねの照り焼き丼（ブロッコリー添え）',
       kcal: 45,
       protein: 14,
@@ -43,7 +41,6 @@ const meals: MealData = {
     },
     {
       id: 'dinner',
-      type: 'dinner',
       name: '鮭と野菜のバター蒸し＋豆腐',
       kcal: 36,
       protein: 22,

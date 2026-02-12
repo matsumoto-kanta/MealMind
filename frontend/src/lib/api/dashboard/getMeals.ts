@@ -3,5 +3,5 @@ import { fetchData } from '../FetchData'
 
 export const getMeals = async () => {
   const response: { meals: MealData } = await fetchData('/meals')
-  return response
+  return response.meals
 }
