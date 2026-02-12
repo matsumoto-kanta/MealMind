@@ -1,6 +1,5 @@
 export interface MealDetailData {
-  id: string
-  type: 'morning' | 'lunch' | 'dinner'
+  id: 'breakfast' | 'lunch' | 'dinner'
   name: string
   kcal: number
   cost: number
@@ -11,6 +10,7 @@ export interface MealDetailData {
 }
 
 export interface MealData {
-  status: 'draft' | 'fixed'
+  status?: 'draft' | 'fixed'
+  date?: string
   detail: MealDetailData[]
 }
