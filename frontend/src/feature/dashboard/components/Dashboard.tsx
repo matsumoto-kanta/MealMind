@@ -7,9 +7,10 @@ import { MealData } from '@/types/Meal'
 import MealCards from './card/MealCards'
 import MealEditDrawer from './drawer/MealEditDrawer'
 import useOpenCards from '@/hooks/useOpenCards'
+import { postGenerateMeals } from '@/lib/api/dashboard/postGenerateMeals'
 
 interface DashboardProps {
-  meals: MealData
+  meals: MealData | null
 }
 
 export default function Dashboard({ meals }: DashboardProps) {
@@ -28,7 +29,7 @@ export default function Dashboard({ meals }: DashboardProps) {
     regeneratedCardIds,
     hasRegeneratedRef,
     resetConfirmedCardIds,
-  } = useOpenCards({ meals })
+  } = useOpenCards({ meals: meals ?? undefined })
 
   const handleDrawerOpenChange = useCallback(
     (open: boolean) => {
@@ -44,10 +45,24 @@ export default function Dashboard({ meals }: DashboardProps) {
     [hasRegeneratedRef, resetConfirmedCardIds, router]
   )
 
+  const handleEditOpen = useCallback(async () => {
+    if (meals) {
+      setDrawerOpen(true)
+      return
+    }
+
+    const result = await postGenerateMeals()
+    if (result) {
+      await router.refresh()
+      setDrawerOpen(true)
+    }
+  }, [meals, router])
+
   // 全カード確定時にDrawerを自動クローズ
   useEffect(() => {
     if (
       drawerOpen &&
+      meals &&
       meals.detail.length > 0 &&
       confirmedCardIds.size === meals.detail.length
     ) {
@@ -56,41 +71,40 @@ export default function Dashboard({ meals }: DashboardProps) {
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [
-    confirmedCardIds.size,
-    drawerOpen,
-    meals.detail.length,
-    handleDrawerOpenChange,
-  ])
+  }, [confirmedCardIds.size, drawerOpen, meals, handleDrawerOpenChange])
 
   return (
     <div className="flex flex-col gap-7">
       <MealCards
         meals={meals}
-        onEditOpen={() => setDrawerOpen(true)}
+        onEditOpen={handleEditOpen}
         handleClick={handleClick}
         openCardIds={openCardIds}
       />
 
-      <ShoppingList
-        mealDetail={meals.detail}
-        showCheck={showCheck}
-        setShowCheck={setShowCheck}
-        checked={checked}
-        setChecked={setChecked}
-      />
+      {meals && (
+        <>
+          <ShoppingList
+            mealDetail={meals.detail}
+            showCheck={showCheck}
+            setShowCheck={setShowCheck}
+            checked={checked}
+            setChecked={setChecked}
+          />
 
-      <MealEditDrawer
-        open={drawerOpen}
-        onOpenChange={handleDrawerOpenChange}
-        meals={meals}
-        handleRegeneration={handleRegeneration}
-        handleConfirmed={handleConfirmed}
-        handleClick={handleClick}
-        openCardIds={openCardIds}
-        confirmedCardIds={confirmedCardIds}
-        regeneratedCardIds={regeneratedCardIds}
-      />
+          <MealEditDrawer
+            open={drawerOpen}
+            onOpenChange={handleDrawerOpenChange}
+            meals={meals}
+            handleRegeneration={handleRegeneration}
+            handleConfirmed={handleConfirmed}
+            handleClick={handleClick}
+            openCardIds={openCardIds}
+            confirmedCardIds={confirmedCardIds}
+            regeneratedCardIds={regeneratedCardIds}
+          />
+        </>
+      )}
     </div>
   )
 }

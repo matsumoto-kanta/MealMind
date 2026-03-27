@@ -6,7 +6,7 @@ import { MonthlyBudgetData } from '@/types/Budget'
 import { getMonthlyBudget } from '@/lib/api/budget/getMonthlyBudget'
 
 export default async function MainData() {
-  let meals: MealData
+  let meals: MealData | null
   let history: MealData[]
   let monthlyBudget: MonthlyBudgetData
 

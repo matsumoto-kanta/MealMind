@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { messages } from '@/constants/messages'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import {
   Drawer,
   DrawerContent,
@@ -12,6 +11,7 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from '@/components/ui/drawer'
+import MainButton from '@/components/button/MainButton'
 
 interface EditMonthlyBudgetDrawerProps {
   open: boolean
@@ -66,13 +66,12 @@ export default function EditMonthlyBudgetDrawer({
           </div>
         </div>
 
-        <DrawerFooter className="py-6">
-          <Button
+        <DrawerFooter className="py-6 flex-row">
+          <MainButton
+            variant="primary"
+            label={messages.budget.save}
             onClick={handleSave}
-            className="flex-1 text-primary border border-primary bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
-          >
-            {messages.budget.save}
-          </Button>
+          />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

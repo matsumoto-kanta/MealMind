@@ -75,6 +75,8 @@ export const messages = {
     shoppingList: '買い物リスト',
     edit: '編集',
     done: '完了',
+    noMeals: 'まだ献立がありません',
+    generateMenu: '今日の献立を生成する',
   },
   budget: {
     monthlyBudget: '今月の予算',

@@ -10,7 +10,7 @@ import { MealData } from '@/types/Meal'
 import { MonthlyBudgetData } from '@/types/Budget'
 
 interface MainProps {
-  meals: MealData
+  meals: MealData | null
   history: MealData[]
   monthlyBudget: MonthlyBudgetData
 }
