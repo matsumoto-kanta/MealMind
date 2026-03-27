@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ShoppingList from './card/ShoppingList'
 import { MealData } from '@/types/Meal'
 import MealCards from './card/MealCards'
+import MealEditDrawer from './drawer/MealEditDrawer'
 import useOpenCards from '@/hooks/useOpenCards'
 
 interface DashboardProps {
@@ -11,7 +12,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ meals }: DashboardProps) {
-  const [status, setStatus] = useState<MealData['status']>(meals.status)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const {
     openCardIds,
     showCheck,
@@ -27,23 +28,28 @@ export default function Dashboard({ meals }: DashboardProps) {
     <div className="flex flex-col gap-7">
       <MealCards
         meals={meals}
-        status={status}
-        setStatus={setStatus}
+        onEditOpen={() => setDrawerOpen(true)}
+        handleClick={handleClick}
+        openCardIds={openCardIds}
+      />
+
+      <ShoppingList
+        mealDetail={meals.detail}
+        showCheck={showCheck}
+        setShowCheck={setShowCheck}
+        checked={checked}
+        setChecked={setChecked}
+      />
+
+      <MealEditDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        meals={meals}
         handleRegeneration={handleRegeneration}
         handleConfirmed={handleConfirmed}
         handleClick={handleClick}
         openCardIds={openCardIds}
       />
-
-      {status === 'fixed' && (
-        <ShoppingList
-          mealDetail={meals.detail}
-          showCheck={showCheck}
-          setShowCheck={setShowCheck}
-          checked={checked}
-          setChecked={setChecked}
-        />
-      )}
     </div>
   )
 }

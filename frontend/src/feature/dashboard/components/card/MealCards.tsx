@@ -5,20 +5,14 @@ import MealCard from '@/components/card/MealCard'
 
 interface MealCardsProps {
   meals: MealData
-  status: MealData['status']
-  setStatus: React.Dispatch<React.SetStateAction<MealData['status']>>
-  handleRegeneration: (id: string) => void
-  handleConfirmed: (id: string) => void
+  onEditOpen: () => void
   handleClick: (id: string) => void
   openCardIds: Set<string>
 }
 
 export default function MealCards({
   meals,
-  status,
-  setStatus,
-  handleRegeneration,
-  handleConfirmed,
+  onEditOpen,
   handleClick,
   openCardIds,
 }: MealCardsProps) {
@@ -26,24 +20,18 @@ export default function MealCards({
     <div className="flex flex-col gap-5 text-foreground">
       <TitleAndButton
         title={messages.dashboard.todayMenu}
-        onClick={() => setStatus(status === 'draft' ? 'fixed' : 'draft')}
-        buttonLabel={
-          status === 'draft'
-            ? messages.dashboard.confirmed
-            : messages.dashboard.regeneration
-        }
+        onClick={onEditOpen}
+        buttonLabel={messages.dashboard.edit}
       />
 
-      <div
-        className={`flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar ${status === 'draft' ? 'flex-col gap-4' : 'flex-row gap-8'}`}
-      >
+      <div className="flex flex-row gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
         {meals.detail.map((meal) => (
           <div key={meal.id} className="snap-center">
             <MealCard
-              status={status}
+              status="fixed"
               meal={meal}
-              handleRegeneration={handleRegeneration}
-              handleConfirmed={handleConfirmed}
+              handleRegeneration={() => {}}
+              handleConfirmed={() => {}}
               handleClick={handleClick}
               openCardIds={openCardIds}
             />

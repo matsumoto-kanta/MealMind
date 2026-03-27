@@ -1,0 +1,80 @@
+'use client'
+
+import { useState } from 'react'
+import { messages } from '@/constants/messages'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from '@/components/ui/drawer'
+
+interface EditMonthlyBudgetDrawerProps {
+  open: boolean
+  setOpen: (open: boolean) => void
+  currentBudget: number
+  onSave: (newBudget: number) => void
+}
+
+export default function EditMonthlyBudgetDrawer({
+  open,
+  setOpen,
+  currentBudget,
+  onSave,
+}: EditMonthlyBudgetDrawerProps) {
+  const [value, setValue] = useState(String(currentBudget))
+
+  const handleSave = () => {
+    const parsed = Number(value)
+    if (!isNaN(parsed) && parsed >= 0) {
+      onSave(parsed)
+      setOpen(false)
+    }
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={(value) => setOpen(value)}>
+      <DrawerContent className="mx-auto max-w-107.5">
+        <DrawerHeader className="py-6">
+          <DrawerTitle>{messages.budget.editBudget}</DrawerTitle>
+          <DrawerDescription className="sr-only">
+            {messages.budget.editBudget}
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <div className="px-4">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              ¥
+            </span>
+            <Input
+              type="text"
+              inputMode="numeric"
+              placeholder={messages.budget.budgetPlaceholder}
+              value={Number(value).toLocaleString()}
+              onChange={(e) => {
+                const v = e.target.value.replace(/[^0-9]/g, '')
+                setValue(v)
+              }}
+              className="pl-8 text-[16px]"
+              autoFocus
+            />
+          </div>
+        </div>
+
+        <DrawerFooter className="py-6">
+          <Button
+            onClick={handleSave}
+            className="flex-1 text-primary border border-primary bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
+          >
+            {messages.budget.save}
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}
