@@ -7,6 +7,7 @@ export interface MealDetailData {
   fat: number
   carbohydrates: number
   ingredients: { name: string; amount: string; price: number }[]
+  status?: 'draft' | 'confirmed'
 }
 
 export interface MealData {

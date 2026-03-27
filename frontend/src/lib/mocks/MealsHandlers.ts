@@ -12,6 +12,7 @@ const regeneratedMeals: Record<string, MealDetailData> = {
     fat: 14,
     carbohydrates: 35,
     cost: 250,
+    status: 'draft',
     ingredients: [
       { name: '食パン', amount: '1枚', price: 40 },
       { name: 'アボカド', amount: '1/2個', price: 100 },
@@ -28,6 +29,7 @@ const regeneratedMeals: Record<string, MealDetailData> = {
     fat: 8,
     carbohydrates: 65,
     cost: 350,
+    status: 'draft',
     ingredients: [
       { name: '豚ロース薄切り', amount: '100g', price: 150 },
       { name: 'うどん', amount: '1玉', price: 50 },
@@ -45,6 +47,7 @@ const regeneratedMeals: Record<string, MealDetailData> = {
     fat: 12,
     carbohydrates: 30,
     cost: 420,
+    status: 'draft',
     ingredients: [
       { name: '鶏もも肉', amount: '120g', price: 160 },
       { name: 'トマト缶', amount: '1/2缶', price: 60 },
@@ -67,6 +70,7 @@ let meals: MealData = {
       fat: 10,
       carbohydrates: 38,
       cost: 210,
+      status: 'draft',
       ingredients: [
         { name: '卵', amount: '2個', price: 60 },
         { name: '鶏むね肉', amount: '60g', price: 70 },
@@ -83,6 +87,7 @@ let meals: MealData = {
       fat: 10,
       carbohydrates: 72,
       cost: 320,
+      status: 'draft',
       ingredients: [
         { name: '鶏むね肉', amount: '120g', price: 140 },
         { name: 'ご飯', amount: '180g', price: 70 },
@@ -100,6 +105,7 @@ let meals: MealData = {
       fat: 10,
       carbohydrates: 34,
       cost: 390,
+      status: 'draft',
       ingredients: [
         { name: '鮭', amount: '1切れ', price: 180 },
         { name: 'キャベツ', amount: '80g', price: 40 },
@@ -142,6 +148,11 @@ export const mealsHandlers = [
         { status: 404 }
       )
     }
-    return HttpResponse.json({ meal }, { status: 200 })
+    const confirmedMeal = { ...meal, status: 'confirmed' as const }
+    meals = {
+      ...meals,
+      detail: meals.detail.map((m) => (m.id === id ? confirmedMeal : m)),
+    }
+    return HttpResponse.json({ meal: confirmedMeal }, { status: 200 })
   }),
 ]
