@@ -123,6 +123,10 @@ export const mealsHandlers = [
     return HttpResponse.json({ meals: meals }, { status: 200 })
   }),
 
+  http.post(`${API_BASE_URL}/meals/generate`, async () => {
+    return HttpResponse.json({ meals: meals }, { status: 201 })
+  }),
+
   http.post(`${API_BASE_URL}/meals/:id/regenerate`, async ({ params }) => {
     const id = params.id as string
     const regenerated = regeneratedMeals[id]

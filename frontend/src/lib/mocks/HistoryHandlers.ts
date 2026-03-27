@@ -750,6 +750,6 @@ const history: MealData[] = [
 
 export const historyHandlers = [
   http.post(`${API_BASE_URL}/history`, async () => {
-    return HttpResponse.json({ history: history }, { status: 200 })
+    return HttpResponse.json({ history: history }, { status: 201 })
   }),
 ]

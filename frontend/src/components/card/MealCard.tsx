@@ -5,11 +5,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { ChevronDown, Sun, Sunrise, Sunset } from 'lucide-react'
 import { messages } from '@/constants/messages'
 import { motion } from 'framer-motion'
 import { MealData, MealDetailData } from '@/types/Meal'
+import MainButton from '../button/MainButton'
 
 interface MealCardProps {
   status: MealData['status'] | 'confirmed'
@@ -140,19 +140,17 @@ export default function MealCard({
             - fixed: ボタン非表示（ダッシュボード・履歴表示用） */}
         {(status === 'draft' || status === 'confirmed') && (
           <CardFooter className="flex gap-2 pt-4 px-2">
-            <Button
+            <MainButton
+              variant="destructive"
+              label={messages.dashboard.regeneration}
               onClick={() => handleRegeneration(meal.id)}
-              className="flex-1 text-destructive border border-destructive bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
-            >
-              {messages.dashboard.regeneration}
-            </Button>
+            />
             {status === 'draft' && (
-              <Button
+              <MainButton
+                variant="primary"
+                label={messages.dashboard.confirmed}
                 onClick={() => handleConfirmed(meal.id)}
-                className="flex-1 text-primary border border-primary bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
-              >
-                {messages.dashboard.confirmed}
-              </Button>
+              />
             )}
           </CardFooter>
         )}
