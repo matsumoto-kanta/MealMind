@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import ShoppingList from './card/ShoppingList'
 import { MealData } from '@/types/Meal'
 import MealCards from './card/MealCards'
@@ -12,6 +13,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ meals }: DashboardProps) {
+  const router = useRouter()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const {
     openCardIds,
@@ -22,7 +24,44 @@ export default function Dashboard({ meals }: DashboardProps) {
     handleClick,
     handleRegeneration,
     handleConfirmed,
+    confirmedCardIds,
+    regeneratedCardIds,
+    hasRegeneratedRef,
+    resetConfirmedCardIds,
   } = useOpenCards({ meals })
+
+  const handleDrawerOpenChange = useCallback(
+    (open: boolean) => {
+      setDrawerOpen(open)
+      if (!open) {
+        if (hasRegeneratedRef.current) {
+          router.refresh()
+          hasRegeneratedRef.current = false
+        }
+        resetConfirmedCardIds()
+      }
+    },
+    [hasRegeneratedRef, resetConfirmedCardIds, router]
+  )
+
+  // 全カード確定時にDrawerを自動クローズ
+  useEffect(() => {
+    if (
+      drawerOpen &&
+      meals.detail.length > 0 &&
+      confirmedCardIds.size === meals.detail.length
+    ) {
+      const timer = setTimeout(() => {
+        handleDrawerOpenChange(false)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [
+    confirmedCardIds.size,
+    drawerOpen,
+    meals.detail.length,
+    handleDrawerOpenChange,
+  ])
 
   return (
     <div className="flex flex-col gap-7">
@@ -43,12 +82,14 @@ export default function Dashboard({ meals }: DashboardProps) {
 
       <MealEditDrawer
         open={drawerOpen}
-        onOpenChange={setDrawerOpen}
+        onOpenChange={handleDrawerOpenChange}
         meals={meals}
         handleRegeneration={handleRegeneration}
         handleConfirmed={handleConfirmed}
         handleClick={handleClick}
         openCardIds={openCardIds}
+        confirmedCardIds={confirmedCardIds}
+        regeneratedCardIds={regeneratedCardIds}
       />
     </div>
   )

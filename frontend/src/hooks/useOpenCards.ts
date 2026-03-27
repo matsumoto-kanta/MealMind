@@ -3,7 +3,7 @@ import { putConfirmed } from '@/lib/api/dashboard/putConfirmed'
 import { ShoppingListCheckAtom } from '@/stores/ShoppingListCheckStore'
 import { MealData } from '@/types/Meal'
 import { useAtom } from 'jotai'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface UseOpenCardsProps {
   meals?: MealData
@@ -20,6 +20,19 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
       ? new Set(meals?.detail.map((m) => m.id))
       : new Set()
   )
+
+  // 確定済みカードID管理
+  const [confirmedCardIds, setConfirmedCardIds] = useState<Set<string>>(
+    new Set()
+  )
+  // 再生成済みカードID管理
+  // meals はサーバーデータでドロワー中に更新されないため、
+  // 再生成した meal を追跡し status を 'draft' にオーバーライドする
+  const [regeneratedCardIds, setRegeneratedCardIds] = useState<Set<string>>(
+    new Set()
+  )
+  // 再生成API呼び出しフラグ
+  const hasRegeneratedRef = useRef(false)
 
   // チェックボックス表示
   const [showCheck, setShowCheck] = useState(false)
@@ -52,6 +65,8 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
     const response = await postRegeneration(id)
     if (response) {
       setOpenCardIds((prev) => new Set(prev).add(id))
+      setRegeneratedCardIds((prev) => new Set(prev).add(id))
+      hasRegeneratedRef.current = true
     }
   }
 
@@ -68,7 +83,13 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
         next.delete(id)
         return next
       })
+      setConfirmedCardIds((prev) => new Set(prev).add(id))
     }
+  }
+
+  const resetConfirmedCardIds = () => {
+    setConfirmedCardIds(new Set())
+    setRegeneratedCardIds(new Set())
   }
 
   return {
@@ -81,5 +102,9 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
     handleClick,
     handleRegeneration,
     handleConfirmed,
+    confirmedCardIds,
+    regeneratedCardIds,
+    hasRegeneratedRef,
+    resetConfirmedCardIds,
   }
 }

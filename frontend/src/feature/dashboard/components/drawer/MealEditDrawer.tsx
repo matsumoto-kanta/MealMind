@@ -8,6 +8,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
+import { AnimatePresence } from 'framer-motion'
 
 interface MealEditDrawerProps {
   open: boolean
@@ -17,6 +18,8 @@ interface MealEditDrawerProps {
   handleConfirmed: (id: string) => void
   handleClick: (id: string) => void
   openCardIds: Set<string>
+  confirmedCardIds: Set<string>
+  regeneratedCardIds: Set<string>
 }
 
 export default function MealEditDrawer({
@@ -27,6 +30,8 @@ export default function MealEditDrawer({
   handleConfirmed,
   handleClick,
   openCardIds,
+  confirmedCardIds,
+  regeneratedCardIds,
 }: MealEditDrawerProps) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -38,17 +43,28 @@ export default function MealEditDrawer({
           </DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 pb-6">
-          {meals.detail.map((meal) => (
-            <MealCard
-              key={meal.id}
-              status="draft"
-              meal={meal}
-              handleRegeneration={handleRegeneration}
-              handleConfirmed={handleConfirmed}
-              handleClick={handleClick}
-              openCardIds={openCardIds}
-            />
-          ))}
+          <AnimatePresence>
+            {meals.detail
+              .filter((meal) => !confirmedCardIds.has(meal.id))
+              .map((meal) => (
+                <MealCard
+                  key={meal.id}
+                  // meals はサーバーデータなのでドロワー中は更新されない。
+                  // 再生成APIが成功した meal は regeneratedCardIds で追跡し、
+                  // ローカルで status を 'draft' に戻して確定ボタンを再表示する。
+                  status={
+                    regeneratedCardIds.has(meal.id)
+                      ? 'draft'
+                      : (meal.status ?? 'draft')
+                  }
+                  meal={meal}
+                  handleRegeneration={handleRegeneration}
+                  handleConfirmed={handleConfirmed}
+                  handleClick={handleClick}
+                  openCardIds={openCardIds}
+                />
+              ))}
+          </AnimatePresence>
         </div>
       </DrawerContent>
     </Drawer>

@@ -12,7 +12,7 @@ import { motion } from 'framer-motion'
 import { MealData, MealDetailData } from '@/types/Meal'
 
 interface MealCardProps {
-  status: MealData['status']
+  status: MealData['status'] | 'confirmed'
   meal: MealDetailData
   handleRegeneration: (id: string) => void
   handleConfirmed: (id: string) => void
@@ -49,7 +49,11 @@ export default function MealCard({
   }
 
   return (
-    <motion.div layout>
+    <motion.div
+      layout
+      exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <Card
         className={`rounded-2xl bg-muted/80 border-0 min-w-72 ${cardClassName}`}
       >
@@ -130,8 +134,11 @@ export default function MealCard({
           </motion.div>
         </CardContent>
 
-        {/* ボタン */}
-        {status === 'draft' && (
+        {/* ボタン
+            - draft: 再生成 + 確定ボタンを表示
+            - confirmed: 再生成ボタンのみ（確定済みなので確定ボタンは非表示）
+            - fixed: ボタン非表示（ダッシュボード・履歴表示用） */}
+        {(status === 'draft' || status === 'confirmed') && (
           <CardFooter className="flex gap-2 pt-4 px-2">
             <Button
               onClick={() => handleRegeneration(meal.id)}
@@ -139,12 +146,14 @@ export default function MealCard({
             >
               {messages.dashboard.regeneration}
             </Button>
-            <Button
-              onClick={() => handleConfirmed(meal.id)}
-              className="flex-1 text-primary border border-primary bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
-            >
-              {messages.dashboard.confirmed}
-            </Button>
+            {status === 'draft' && (
+              <Button
+                onClick={() => handleConfirmed(meal.id)}
+                className="flex-1 text-primary border border-primary bg-muted/80 hover:bg-muted/80 hover:cursor-pointer"
+              >
+                {messages.dashboard.confirmed}
+              </Button>
+            )}
           </CardFooter>
         )}
       </Card>
