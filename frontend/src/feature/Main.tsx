@@ -8,14 +8,21 @@ import Budget from './budget/components/Budget'
 import Settings from './settings/components/Settings'
 import { MealData } from '@/types/Meal'
 import { MonthlyBudgetData } from '@/types/Budget'
+import { SettingsData } from '@/types/Settings'
 
 interface MainProps {
   meals: MealData | null
   history: MealData[]
   monthlyBudget: MonthlyBudgetData
+  settings: SettingsData
 }
 
-export default function Main({ meals, history, monthlyBudget }: MainProps) {
+export default function Main({
+  meals,
+  history,
+  monthlyBudget,
+  settings,
+}: MainProps) {
   const tab = useAtomValue(tabAtom)
 
   return (
@@ -25,7 +32,7 @@ export default function Main({ meals, history, monthlyBudget }: MainProps) {
       ) : tab === 'history' ? (
         <History history={history} />
       ) : tab === 'settings' ? (
-        <Settings />
+        <Settings settings={settings} />
       ) : (
         <Dashboard meals={meals} />
       )}

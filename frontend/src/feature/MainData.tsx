@@ -4,20 +4,31 @@ import { MealData } from '@/types/Meal'
 import { postHistory } from '@/lib/api/history/postHistory'
 import { MonthlyBudgetData } from '@/types/Budget'
 import { getMonthlyBudget } from '@/lib/api/budget/getMonthlyBudget'
+import { SettingsData } from '@/types/Settings'
+import { getSettings } from '@/lib/api/settings/getSettings'
 
 export default async function MainData() {
   let meals: MealData | null
   let history: MealData[]
   let monthlyBudget: MonthlyBudgetData
+  let settings: SettingsData
 
   try {
     meals = await getMeals()
     history = await postHistory()
     monthlyBudget = await getMonthlyBudget()
+    settings = await getSettings()
   } catch (err) {
     console.error(err)
     throw new Error()
   }
 
-  return <Main meals={meals} history={history} monthlyBudget={monthlyBudget} />
+  return (
+    <Main
+      meals={meals}
+      history={history}
+      monthlyBudget={monthlyBudget}
+      settings={settings}
+    />
+  )
 }
