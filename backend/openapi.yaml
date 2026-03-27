@@ -1,0 +1,719 @@
+openapi: 3.1.0
+info:
+  title: MealMind API
+  description: |
+    予算と体型から逆算して、今日の食事を決めてくれる AI 栄養士のバックエンドAPI
+  version: 1.0.0
+  contact:
+    name: MealMind Team
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+tags:
+  - name: auth
+    description: 認証関連
+  - name: meals
+    description: 献立関連
+  - name: history
+    description: 履歴関連
+  - name: budget
+    description: 予算関連
+  - name: settings
+    description: 設定関連
+
+paths:
+  /logout:
+    post:
+      tags:
+        - auth
+      summary: ログアウト
+      description: ユーザーをログアウトさせ、セッションを無効化する
+      operationId: logout
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /meals:
+    get:
+      tags:
+        - meals
+      summary: 今日の献立取得
+      description: 今日の献立データを取得する
+      operationId: getMeals
+      responses:
+        '200':
+          description: 献立データ取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - meals
+                properties:
+                  meals:
+                    $ref: '#/components/schemas/MealData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /meals/generate:
+    post:
+      tags:
+        - meals
+      summary: 献立生成
+      description: AIを使用して新しい献立を生成する
+      operationId: generateMeals
+      responses:
+        '201':
+          description: 献立生成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - meals
+                properties:
+                  meals:
+                    $ref: '#/components/schemas/MealData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /meals/{id}/regenerate:
+    post:
+      tags:
+        - meals
+      summary: 献立再生成
+      description: 指定した献立(朝/昼/夜)を再生成する
+      operationId: regenerateMeal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 献立ID (breakfast, lunch, dinner)
+          schema:
+            type: string
+            enum:
+              - breakfast
+              - lunch
+              - dinner
+      responses:
+        '200':
+          description: 献立再生成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - meal
+                properties:
+                  meal:
+                    $ref: '#/components/schemas/MealDetailData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /meals/{id}/confirm:
+    put:
+      tags:
+        - meals
+      summary: 献立確定
+      description: 指定した献立を確定状態にする
+      operationId: confirmMeal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 献立ID (breakfast, lunch, dinner)
+          schema:
+            type: string
+            enum:
+              - breakfast
+              - lunch
+              - dinner
+      responses:
+        '200':
+          description: 献立確定成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - meal
+                properties:
+                  meal:
+                    $ref: '#/components/schemas/MealDetailData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /history:
+    post:
+      tags:
+        - history
+      summary: 履歴取得
+      description: 過去の献立履歴を取得する(ページネーション対応)
+      operationId: getHistory
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                page:
+                  type: integer
+                  description: ページ番号(0から開始)
+                  example: 0
+      responses:
+        '201':
+          description: 履歴取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - history
+                properties:
+                  history:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MealData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /monthlyBudget:
+    get:
+      tags:
+        - budget
+      summary: 月間予算取得
+      description: 月間予算データを取得する
+      operationId: getMonthlyBudget
+      responses:
+        '200':
+          description: 予算データ取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - monthlyBudget
+                properties:
+                  monthlyBudget:
+                    $ref: '#/components/schemas/MonthlyBudgetData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - budget
+      summary: 月間予算更新
+      description: 月間予算を更新する
+      operationId: updateMonthlyBudget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - monthlyBudget
+              properties:
+                monthlyBudget:
+                  type: integer
+                  description: 月間予算額
+                  example: 20000
+      responses:
+        '200':
+          description: 予算更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - monthlyBudget
+                properties:
+                  monthlyBudget:
+                    $ref: '#/components/schemas/MonthlyBudgetData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /settings:
+    get:
+      tags:
+        - settings
+      summary: 設定取得
+      description: ユーザーの設定データを取得する
+      operationId: getSettings
+      responses:
+        '200':
+          description: 設定データ取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - settings
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/SettingsData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /settings/profile:
+    put:
+      tags:
+        - settings
+      summary: プロフィール更新
+      description: ユーザーのプロフィール情報を更新する
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileData'
+      responses:
+        '200':
+          description: プロフィール更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - settings
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/SettingsData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /settings/goal:
+    put:
+      tags:
+        - settings
+      summary: 目標更新
+      description: ユーザーの目標体重を更新する
+      operationId: updateGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalData'
+      responses:
+        '200':
+          description: 目標更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - settings
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/SettingsData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /settings/preference:
+    put:
+      tags:
+        - settings
+      summary: 食の好み・アレルギー更新
+      description: ユーザーの食の好み・アレルギー情報を更新する
+      operationId: updatePreference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceData'
+      responses:
+        '200':
+          description: 食の好み・アレルギー更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - settings
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/SettingsData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    # 献立関連のスキーマ
+    IngredientData:
+      type: object
+      required:
+        - name
+        - amount
+        - price
+      properties:
+        name:
+          type: string
+          description: 食材名
+          example: 卵
+        amount:
+          type: string
+          description: 量
+          example: 2個
+        price:
+          type: integer
+          description: 価格
+          example: 60
+
+    MealDetailData:
+      type: object
+      required:
+        - id
+        - name
+        - kcal
+        - cost
+        - protein
+        - fat
+        - carbohydrates
+        - ingredients
+      properties:
+        id:
+          type: string
+          enum:
+            - breakfast
+            - lunch
+            - dinner
+          description: 献立ID
+        name:
+          type: string
+          description: 料理名
+          example: 高タンパク和風オムレツ定食
+        kcal:
+          type: integer
+          description: カロリー
+          example: 320
+        cost:
+          type: integer
+          description: 想定コスト
+          example: 210
+        protein:
+          type: integer
+          description: タンパク質(g)
+          example: 18
+        fat:
+          type: integer
+          description: 脂質(g)
+          example: 10
+        carbohydrates:
+          type: integer
+          description: 炭水化物(g)
+          example: 38
+        status:
+          type: string
+          enum:
+            - draft
+            - confirmed
+          description: 状態
+        ingredients:
+          type: array
+          description: 食材リスト
+          items:
+            $ref: '#/components/schemas/IngredientData'
+
+    MealData:
+      type: object
+      required:
+        - detail
+      properties:
+        status:
+          type: string
+          enum:
+            - draft
+            - fixed
+          description: 全体の状態
+        date:
+          type: string
+          format: date
+          description: 日付
+          example: '2026-02-11'
+        detail:
+          type: array
+          description: 献立詳細(朝・昼・夜)
+          items:
+            $ref: '#/components/schemas/MealDetailData'
+          minItems: 3
+          maxItems: 3
+
+    # 予算関連のスキーマ
+    BudgetHistoryItem:
+      type: object
+      required:
+        - yearMonth
+        - budget
+        - spent
+      properties:
+        yearMonth:
+          type: string
+          description: 年月
+          example: '2025-03'
+        budget:
+          type: integer
+          description: 月の予算
+          example: 100000
+        spent:
+          type: integer
+          description: 使用金額
+          example: 82000
+
+    MonthlyBudgetData:
+      type: object
+      required:
+        - monthlyBudget
+        - remainingMonthlyBudget
+        - todayBudget
+        - history
+      properties:
+        monthlyBudget:
+          type: integer
+          description: 月間予算
+          example: 20000
+        remainingMonthlyBudget:
+          type: integer
+          description: 月の残り予算
+          example: 15000
+        todayBudget:
+          type: integer
+          description: 今日の予想消費額
+          example: 920
+        history:
+          type: array
+          description: 月間履歴
+          items:
+            $ref: '#/components/schemas/BudgetHistoryItem'
+
+    # 設定関連のスキーマ
+    ProfileData:
+      type: object
+      required:
+        - gender
+        - age
+        - height
+        - weight
+        - activityLevel
+      properties:
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+            - other
+          description: 性別
+        age:
+          type: integer
+          description: 年齢
+          example: 28
+        height:
+          type: integer
+          description: 身長(cm)
+          example: 172
+        weight:
+          type: integer
+          description: 体重(kg)
+          example: 68
+        activityLevel:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+          description: 活動量
+
+    GoalData:
+      type: object
+      required:
+        - targetWeight
+      properties:
+        targetWeight:
+          type: integer
+          description: 目標体重(kg)
+          example: 63
+
+    PreferenceData:
+      type: object
+      required:
+        - dislikedFoods
+        - allergies
+      properties:
+        dislikedFoods:
+          type: array
+          description: 嫌いな食べ物
+          items:
+            type: string
+          example:
+            - パクチー
+            - セロリ
+        allergies:
+          type: array
+          description: アレルギー食材
+          items:
+            type: string
+          example:
+            - えび
+            - かに
+
+    SettingsData:
+      type: object
+      required:
+        - profile
+        - goal
+        - preference
+      properties:
+        profile:
+          $ref: '#/components/schemas/ProfileData'
+        goal:
+          $ref: '#/components/schemas/GoalData'
+        preference:
+          $ref: '#/components/schemas/PreferenceData'
+
+    # エラーレスポンス
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - status
+            - messages
+          properties:
+            status:
+              type: integer
+              description: HTTPステータスコード
+            messages:
+              type: string
+              description: エラーメッセージ
+            errorText:
+              type: string
+              description: 詳細なエラー情報
+
+  responses:
+    Unauthorized:
+      description: 認証エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 401
+              messages: 認証に失敗しました。再度ログインしてください。
+
+    Forbidden:
+      description: アクセス権限エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 403
+              messages: このリソースへのアクセス権限がありません。
+
+    NotFound:
+      description: リソースが見つからない
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 404
+              messages: 指定されたリソースが見つかりませんでした。
+
+    Conflict:
+      description: データの競合
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 409
+              messages: データが競合しています。
+
+    UnprocessableEntity:
+      description: バリデーションエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 422
+              messages: 入力データが正しくありません。
+
+    InternalServerError:
+      description: サーバーエラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 500
+              messages: サーバーでエラーが発生しました。時間をおいて再度お試しください。
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: HTTPOnly Cookieによる認証
+
+security:
+  - cookieAuth: []

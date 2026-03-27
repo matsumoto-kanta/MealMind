@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # Cloud SQL Proxy (Google Cloud SQLに接続)
+  cloud-sql-proxy:
+    image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:latest
+    container_name: mealmind-cloud-sql-proxy
+    command:
+      - "--port=5432"
+      - "${CLOUD_SQL_CONNECTION_NAME}"
+    ports:
+      - "5432:5432"
+    volumes:
+      # Google Cloud認証情報をマウント
+      - ~/.config/gcloud:/root/.config/gcloud:ro
+    networks:
+      - mealmind-network
+    restart: unless-stopped
+
+  # バックエンドAPI (Cloud SQL接続版)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mealmind-backend
+    ports:
+      - "8000:8080"
+    env_file:
+      - .env
+    environment:
+      - PORT=8080
+      # Cloud SQL Proxy経由で接続
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@cloud-sql-proxy:5432/${DB_NAME}
+    depends_on:
+      - cloud-sql-proxy
+    volumes:
+      # ホットリロード用にソースをマウント（開発時のみ）
+      - ./app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+    networks:
+      - mealmind-network
+
+networks:
+  mealmind-network:
+    driver: bridge
