@@ -3,9 +3,11 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogTitle,
 } from '../ui/dialog'
 import { Handshake } from 'lucide-react'
+import MainButton from '../button/MainButton'
 
 interface SetUpPopupProps {
   open: boolean
@@ -15,19 +17,28 @@ interface SetUpPopupProps {
 export default function SetUpPopup({ open, setOpen }: SetUpPopupProps) {
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
-      <DialogTitle />
-      <DialogDescription />
-      <DialogContent className="rounded-2xl max-w-100.5!">
+      <DialogContent
+        className="rounded-2xl max-w-100.5!"
+        showCloseButton={false}
+      >
         <div className="flex flex-col items-center gap-4">
           <Handshake className="size-10" />
 
-          <h1 className="text-[24px] font-semibold">
+          <DialogTitle className="text-[24px] font-semibold">
             {messages.settings.popup.title}
-          </h1>
+          </DialogTitle>
 
-          <span className="text-[14px] text-center text-muted-foreground whitespace-pre-wrap">
+          <DialogDescription className="text-[14px] text-center text-muted-foreground whitespace-pre-wrap">
             {messages.settings.popup.description}
-          </span>
+          </DialogDescription>
+
+          <DialogFooter className="w-full pt-4">
+            <MainButton
+              variant="primary"
+              label={messages.settings.popup.button}
+              onClick={() => setOpen(false)}
+            ></MainButton>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

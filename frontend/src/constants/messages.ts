@@ -84,6 +84,7 @@ export const messages = {
       title: '初回設定をはじめましょう',
       description:
         '一度設定すれば、\nAIがあなたに合った献立を自動で提案します。',
+      button: '設定を始める',
     },
     profile: {
       title: 'プロフィール',
