@@ -1,0 +1,40 @@
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# 開発ファイル
+.env
+.env.local
+*.log
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# テスト
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ドキュメント
+README.md
+docs/
+
+# その他
+*.md
+!requirements.txt
