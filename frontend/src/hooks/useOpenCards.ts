@@ -1,3 +1,5 @@
+import { postRegeneration } from '@/lib/api/dashboard/postRegeneration'
+import { putConfirmed } from '@/lib/api/dashboard/putConfirmed'
 import { ShoppingListCheckAtom } from '@/stores/ShoppingListCheckStore'
 import { MealData } from '@/types/Meal'
 import { useAtom } from 'jotai'
@@ -42,25 +44,31 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
   }
 
   /**
-   * 再生成されたカードを開く
+   * 再生成APIを呼び出し、成功時にカードを開く
    *
    * @param id - 対象の meal カード ID
    */
-  const handleRegeneration = (id: string) => {
-    setOpenCardIds((prev) => new Set(prev).add(id))
+  const handleRegeneration = async (id: string) => {
+    const response = await postRegeneration(id)
+    if (response) {
+      setOpenCardIds((prev) => new Set(prev).add(id))
+    }
   }
 
   /**
-   * 確定したカードを閉じる
+   * 確定APIを呼び出し、成功時にカードを閉じる
    *
    * @param id - 対象の meal カード ID
    */
-  const handleConfirmed = (id: string) => {
-    setOpenCardIds((prev) => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
+  const handleConfirmed = async (id: string) => {
+    const response = await putConfirmed(id)
+    if (response) {
+      setOpenCardIds((prev) => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    }
   }
 
   return {

@@ -1,5 +1,10 @@
 export const messages = {
   common: {
+    toastMessage: {
+      successConfirmed: '確定しました。',
+      successRegeneration: '再生成しました。',
+      successUpdate: '更新しました。',
+    },
     errorMessage: {
       unauthorized: '認証に失敗しました。',
       forbidden: '権限がありません。',
@@ -25,6 +30,7 @@ export const messages = {
     },
     unit: {
       yen: '円',
+      yearMonth: '年月',
     },
   },
   auth: {
@@ -69,5 +75,16 @@ export const messages = {
     shoppingList: '買い物リスト',
     edit: '編集',
     done: '完了',
+  },
+  budget: {
+    monthlyBudget: '今月の予算',
+    remainingBudget: '残りの予算',
+    legendRemaining: '残り',
+    legendToday: '今日の予算',
+    legendSpent: '使用済み',
+    monthlyHistory: '月間履歴',
+    editBudget: '今月の予算を編集',
+    save: '保存',
+    budgetPlaceholder: '今月の予算を入力',
   },
 }

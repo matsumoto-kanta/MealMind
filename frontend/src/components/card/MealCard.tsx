@@ -123,7 +123,7 @@ export default function MealCard({
                   <span>
                     {i.name}（{i.amount}）
                   </span>
-                  <span>¥{i.price}</span>
+                  <span>¥{i.price.toLocaleString()}</span>
                 </div>
               ))}
             </div>

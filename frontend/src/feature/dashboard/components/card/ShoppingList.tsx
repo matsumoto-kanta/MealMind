@@ -101,7 +101,7 @@ export default function ShoppingList({
               </span>
               {/* 値段 */}
               <span className="text-end">
-                {ing.price}
+                {ing.price.toLocaleString()}
                 {messages.common.unit.yen}
               </span>
             </li>

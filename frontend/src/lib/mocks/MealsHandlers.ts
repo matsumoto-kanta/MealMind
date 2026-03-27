@@ -1,9 +1,62 @@
-import { MealData } from '@/types/Meal'
+import { MealData, MealDetailData } from '@/types/Meal'
 import { http, HttpResponse } from 'msw'
 
 const API_BASE_URL = process.env.API_BASE_URL
 
-const meals: MealData = {
+const regeneratedMeals: Record<string, MealDetailData> = {
+  breakfast: {
+    id: 'breakfast',
+    name: 'アボカドトースト＆スクランブルエッグ',
+    kcal: 38,
+    protein: 15,
+    fat: 14,
+    carbohydrates: 35,
+    cost: 250,
+    ingredients: [
+      { name: '食パン', amount: '1枚', price: 40 },
+      { name: 'アボカド', amount: '1/2個', price: 100 },
+      { name: '卵', amount: '2個', price: 60 },
+      { name: 'トマト', amount: '1/4個', price: 30 },
+      { name: 'オリーブオイル', amount: '適量', price: 20 },
+    ],
+  },
+  lunch: {
+    id: 'lunch',
+    name: '豚しゃぶサラダうどん',
+    kcal: 42,
+    protein: 18,
+    fat: 8,
+    carbohydrates: 65,
+    cost: 350,
+    ingredients: [
+      { name: '豚ロース薄切り', amount: '100g', price: 150 },
+      { name: 'うどん', amount: '1玉', price: 50 },
+      { name: 'レタス', amount: '50g', price: 30 },
+      { name: 'きゅうり', amount: '1/2本', price: 30 },
+      { name: 'ポン酢', amount: '適量', price: 20 },
+      { name: 'ごま', amount: '適量', price: 10 },
+    ],
+  },
+  dinner: {
+    id: 'dinner',
+    name: '鶏もも肉のトマト煮込み',
+    kcal: 40,
+    protein: 24,
+    fat: 12,
+    carbohydrates: 30,
+    cost: 420,
+    ingredients: [
+      { name: '鶏もも肉', amount: '120g', price: 160 },
+      { name: 'トマト缶', amount: '1/2缶', price: 60 },
+      { name: '玉ねぎ', amount: '1/2個', price: 40 },
+      { name: 'ピーマン', amount: '1個', price: 30 },
+      { name: 'にんにく', amount: '1片', price: 20 },
+      { name: 'コンソメ', amount: '適量', price: 10 },
+    ],
+  },
+}
+
+let meals: MealData = {
   status: 'fixed',
   detail: [
     {
@@ -62,5 +115,33 @@ const meals: MealData = {
 export const mealsHandlers = [
   http.get(`${API_BASE_URL}/meals`, async () => {
     return HttpResponse.json({ meals: meals }, { status: 200 })
+  }),
+
+  http.post(`${API_BASE_URL}/meals/:id/regenerate`, async ({ params }) => {
+    const id = params.id as string
+    const regenerated = regeneratedMeals[id]
+    if (!regenerated) {
+      return HttpResponse.json(
+        { error: { status: 404, messages: '献立が見つかりません。' } },
+        { status: 404 }
+      )
+    }
+    meals = {
+      ...meals,
+      detail: meals.detail.map((m) => (m.id === id ? regenerated : m)),
+    }
+    return HttpResponse.json({ meal: regenerated }, { status: 200 })
+  }),
+
+  http.put(`${API_BASE_URL}/meals/:id/confirm`, async ({ params }) => {
+    const id = params.id as string
+    const meal = meals.detail.find((m) => m.id === id)
+    if (!meal) {
+      return HttpResponse.json(
+        { error: { status: 404, messages: '献立が見つかりません。' } },
+        { status: 404 }
+      )
+    }
+    return HttpResponse.json({ meal }, { status: 200 })
   }),
 ]

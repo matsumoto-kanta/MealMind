@@ -4,7 +4,11 @@ import { Toaster } from '@/components/ui/sonner'
 import { useAtom, useAtomValue } from 'jotai'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { showToastAtom, toastMessageAtom } from '@/stores/ToastStore'
+import {
+  showToastAtom,
+  toastMessageAtom,
+  toastErrorMessageAtom,
+} from '@/stores/ToastStore'
 import MainTab, { tabs } from '@/components/tab/MainTab'
 import { tabAtom } from '@/stores/TabStore'
 
@@ -14,17 +18,35 @@ export default function MainLayout({
   children: React.ReactNode
 }) {
   const [tab, setTab] = useAtom(tabAtom)
-  const showToast = useAtomValue(showToastAtom)
+  const [showToast, setShowToast] = useAtom(showToastAtom)
   const toastMessage = useAtomValue(toastMessageAtom)
+  const toastErrorMessage = useAtomValue(toastErrorMessageAtom)
 
   const currentTab = tabs.find((t) => t.key === tab)
   const title = currentTab?.label ?? ''
 
   useEffect(() => {
     if (showToast) {
-      toast.success(toastMessage)
+      toast.dismiss() // 既存のものを全て消すので、常に最新の1個だけ表示
+      if (toastErrorMessage) {
+        toast.error(toastErrorMessage, {
+          style: {
+            backgroundColor: 'var(--destructive)',
+            color: 'white',
+            borderColor: 'var(--destructive)',
+          },
+        })
+      } else {
+        toast.success(toastMessage, {
+          style: {
+            backgroundColor: 'var(--primary)',
+            color: 'white',
+            borderColor: 'var(--primary)',
+          },
+        })
+      }
     }
-  }, [showToast, toastMessage])
+  }, [showToast, toastMessage, toastErrorMessage, setShowToast])
 
   return (
     <>
@@ -42,7 +64,7 @@ export default function MainLayout({
         {/* タブバー */}
         <MainTab tab={tab} onChange={setTab} />
       </div>
-      {showToast && toastMessage && <Toaster />}
+      <Toaster position="top-center" />
     </>
   )
 }

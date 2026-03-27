@@ -16,14 +16,14 @@ export const tabs = [
     icon: House,
   },
   {
-    key: 'history',
-    label: messages.common.tab.log,
-    icon: History,
-  },
-  {
     key: 'budget',
     label: messages.common.tab.budget,
     icon: BadgeJapaneseYen,
+  },
+  {
+    key: 'history',
+    label: messages.common.tab.log,
+    icon: History,
   },
   {
     key: 'settings',
