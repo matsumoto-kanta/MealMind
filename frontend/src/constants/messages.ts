@@ -80,6 +80,11 @@ export const messages = {
   },
   settings: {
     title: '設定',
+    popup: {
+      title: '初回設定をはじめましょう',
+      description:
+        '一度設定すれば、\nAIがあなたに合った献立を自動で提案します。',
+    },
     profile: {
       title: 'プロフィール',
       gender: '性別',
@@ -99,7 +104,7 @@ export const messages = {
       weightPlaceholder: '体重を入力',
     },
     goal: {
-      title: '目標設定',
+      title: '目標',
       targetWeight: '目標体重',
       diff: '現在との差',
       editTitle: '目標体重を編集',
