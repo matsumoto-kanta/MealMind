@@ -5,6 +5,7 @@ import { SettingsData, ProfileData, PreferenceData } from '@/types/Settings'
 import Profile from './item/Profile'
 import Goal from './item/Goal'
 import Preference from './item/Preference'
+import Logout from './item/Logout'
 import EditProfileDrawer from './drawer/EditProfileDrawer'
 import EditGoalDrawer from './drawer/EditGoalDrawer'
 import EditPreferenceDrawer from './drawer/EditPreferenceDrawer'
@@ -90,6 +91,9 @@ export default function Settings({ settings }: SettingsProps) {
         preference={data.preference}
         onSave={handleSavePreference}
       />
+
+      {/* ログアウト */}
+      <Logout />
     </div>
   )
 }
