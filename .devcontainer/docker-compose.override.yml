@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backend:
+    # ワークスペース全体をマウント（開発用）
+    volumes:
+      - ..:/workspace:cached
+      - /workspace/backend/app  # ホットリロード用
+    working_dir: /workspace/backend
+
+    # 開発用の追加設定
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+
+    # コンテナを起動したままにする（VS Codeが接続するため）
+    command: sleep infinity

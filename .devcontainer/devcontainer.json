@@ -1,0 +1,101 @@
+{
+  "name": "MealMind Full Stack",
+  "dockerComposeFile": "../backend/docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/workspace",
+
+  // コンテナ起動後に実行するコマンド
+  "postCreateCommand": "cd /workspace/backend && pip install -r requirements.txt && cd /workspace/frontend && npm install",
+
+  // VS Code拡張機能
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Python開発
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+
+        // TypeScript/Next.js開発
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+
+        // データベース
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+
+        // Git
+        "eamodio.gitlens",
+
+        // その他
+        "ms-azuretools.vscode-docker",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": false,
+        "python.formatting.provider": "black",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+          }
+        },
+        "sqltools.connections": [
+          {
+            "name": "MealMind DB",
+            "driver": "PostgreSQL",
+            "server": "db",
+            "port": 5432,
+            "database": "${env:DB_NAME}",
+            "username": "${env:DB_USER}",
+            "password": "${env:DB_PASSWORD}"
+          }
+        ]
+      }
+    }
+  },
+
+  // ポートフォワーディング
+  "forwardPorts": [
+    8080, // Backend API (コンテナ内のポート)
+    3000, // Frontend (Next.js)
+    5432, // PostgreSQL
+    5050 // pgAdmin
+  ],
+
+  "portsAttributes": {
+    "8080": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    },
+    "5050": {
+      "label": "pgAdmin",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // コンテナ内でrootユーザーではなく、appuserを使用
+  "remoteUser": "appuser",
+
+  // シェル環境
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {}
+  }
+}

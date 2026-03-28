@@ -6,10 +6,17 @@ WORKDIR /app
 
 # システムパッケージの更新とPostgreSQL用のライブラリをインストール
 RUN apt-get update && apt-get install -y \
+    bash \
     gcc \
     postgresql-client \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# /bin/sh を bash にリンク（Dev Container features互換性のため）
+RUN ln -sf /bin/bash /bin/sh
+
+# デフォルトシェルをbashに設定
+SHELL ["/bin/bash", "-c"]
 
 # 依存関係ファイルをコピー
 COPY requirements.txt .
