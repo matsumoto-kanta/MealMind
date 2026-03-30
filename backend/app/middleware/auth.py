@@ -7,7 +7,7 @@ from app.core.security import decode_access_token
 
 async def get_current_user(request: Request) -> Dict[str, Any]:
     """
-    リクエストのCookieからJWTトークンを取得し、ユーザー情報を返します。
+    リクエストのCookieまたはAuthorizationヘッダーからJWTトークンを取得し、ユーザー情報を返します。
 
     Args:
         request: FastAPIのRequestオブジェクト
@@ -20,6 +20,12 @@ async def get_current_user(request: Request) -> Dict[str, Any]:
     """
     # Cookieからアクセストークンを取得
     access_token = request.cookies.get("accessToken")
+
+    # Cookieにない場合、Authorizationヘッダーから取得
+    if not access_token:
+        authorization = request.headers.get("Authorization")
+        if authorization and authorization.startswith("Bearer "):
+            access_token = authorization.replace("Bearer ", "")
 
     if not access_token:
         raise HTTPException(

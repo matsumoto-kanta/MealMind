@@ -31,8 +31,9 @@ export async function fetchData(
 ) {
   try {
     const url = new URL(`${API_BASE_URL}${path}`)
-    const cookiesStore = cookies()
-    const accessToken = (await cookiesStore).get('accessToken')?.value
+    const cookiesStore = await cookies()
+    const accessToken = cookiesStore.get('accessToken')?.value
+
     if (
       params &&
       options?.method !== 'POST' &&

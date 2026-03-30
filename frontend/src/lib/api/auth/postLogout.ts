@@ -6,14 +6,14 @@ import {
 } from '@/stores/ToastStore'
 import { authAtom } from '@/stores/AuthStore'
 import { getErrorMessageByStatus } from '@/utils/getErrorMessageByStatus'
-import { fetchDataClient } from '../FetchDataClient'
+import { fetchData } from '../FetchData'
 
 /**
  * ログアウトAPI
  * @returns 成功時はtrue、エラー時はfalse
  */
 export const postLogout = async (): Promise<boolean> => {
-  const response = await fetchDataClient('/auth/logout', undefined, {
+  const response = await fetchData('/auth/logout', undefined, {
     method: 'POST',
   })
 

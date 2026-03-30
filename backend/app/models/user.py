@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 import uuid
 
 from app.models.base import Base
@@ -16,3 +17,6 @@ class User(Base):
     picture = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relationships
+    settings = relationship("UserSettings", back_populates="user", uselist=False)
