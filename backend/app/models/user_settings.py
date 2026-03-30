@@ -41,6 +41,7 @@ class UserSettings(Base):
 
     # Goal
     target_weight = Column(Integer, nullable=False)  # kg
+    target_period_months = Column(Integer, nullable=False)  # months
 
     # Preferences
     disliked_foods = Column(ARRAY(String), nullable=False, default=[])

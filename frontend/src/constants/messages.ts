@@ -95,9 +95,11 @@ export const messages = {
     goal: {
       title: '目標',
       targetWeight: '目標体重',
+      targetPeriod: '目標達成期間',
       diff: '現在との差',
-      editTitle: '目標体重を編集',
+      editTitle: '目標を編集',
       targetWeightPlaceholder: '目標体重を入力',
+      targetPeriodPlaceholder: '期間を入力',
     },
     preference: {
       title: '食の好み・アレルギー',
@@ -113,6 +115,7 @@ export const messages = {
       years: '歳',
       cm: 'cm',
       kg: 'kg',
+      months: 'ヶ月',
     },
   },
   budget: {
