@@ -31,8 +31,8 @@ export async function fetchData(
 ) {
   try {
     const url = new URL(`${API_BASE_URL}${path}`)
-    const cookiesStore = cookies();
-    const accessToken = (await cookiesStore).get('accessToken')?.value;
+    const cookiesStore = cookies()
+    const accessToken = (await cookiesStore).get('accessToken')?.value
     if (
       params &&
       options?.method !== 'POST' &&
@@ -59,7 +59,7 @@ export async function fetchData(
       headers: {
         // FormDataの場合はContent-Typeを設定しない（ブラウザが自動設定）
         ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         ...options?.headers,
       },
     }

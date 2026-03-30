@@ -3,7 +3,8 @@
 import { messages } from '@/constants/messages'
 import { ERROR_STATUS, SUCCESS_STATUS } from '@/constants/response'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'
 
 interface QueryParams {
   [key: string]: string | number | boolean | string[] | number[]
