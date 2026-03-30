@@ -11,12 +11,16 @@ import {
 } from '@/stores/ToastStore'
 import MainTab, { tabs } from '@/components/tab/MainTab'
 import { tabAtom } from '@/stores/TabStore'
+import { useAuthCheck } from '@/hooks/useAuthCheck'
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // 認証状態を初期化
+  useAuthCheck()
+
   const [tab, setTab] = useAtom(tabAtom)
   const [showToast, setShowToast] = useAtom(showToastAtom)
   const toastMessage = useAtomValue(toastMessageAtom)

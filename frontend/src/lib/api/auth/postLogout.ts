@@ -1,18 +1,19 @@
-import { fetchData } from '../FetchData'
 import { getDefaultStore } from 'jotai'
 import {
   showToastAtom,
   toastMessageAtom,
   toastErrorMessageAtom,
 } from '@/stores/ToastStore'
+import { authAtom } from '@/stores/AuthStore'
 import { getErrorMessageByStatus } from '@/utils/getErrorMessageByStatus'
+import { fetchDataClient } from '../FetchDataClient'
 
 /**
  * ログアウトAPI
  * @returns 成功時はtrue、エラー時はfalse
  */
 export const postLogout = async (): Promise<boolean> => {
-  const response = await fetchData('/logout', undefined, {
+  const response = await fetchDataClient('/auth/logout', undefined, {
     method: 'POST',
   })
 
@@ -28,6 +29,13 @@ export const postLogout = async (): Promise<boolean> => {
     store.set(showToastAtom, true)
     return false
   }
+
+  // ログアウト成功時に認証状態をリセット
+  store.set(authAtom, {
+    user: null,
+    isLoading: false,
+    isAuthenticated: false,
+  })
 
   return true
 }

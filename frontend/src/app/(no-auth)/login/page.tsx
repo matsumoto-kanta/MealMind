@@ -3,15 +3,12 @@
 import { Button } from '@/components/ui/button'
 import { messages } from '@/constants/messages'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { getGoogleLogin } from '@/lib/api/auth/getGoogleLogin'
 
 export default function LoginPage() {
-  const router = useRouter()
-
   const handleGoogleLogin = async () => {
-    // TODO: Googleログイン処理を実装
-    console.log('Google login clicked')
-    router.push('/main')
+    // バックエンドのOAuthエンドポイントへリダイレクト
+    getGoogleLogin()
   }
 
   return (
