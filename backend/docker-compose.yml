@@ -21,6 +21,8 @@ services:
       - ..:/workspace:cached
       # ホットリロード用にソースをマウント（開発時のみ）
       - ./app:/app/app
+      # マイグレーションファイルの同期用
+      - ./alembic:/app/alembic
     command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
     networks:
       - mealmind-network

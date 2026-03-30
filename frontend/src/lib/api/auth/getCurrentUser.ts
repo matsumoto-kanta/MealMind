@@ -1,6 +1,6 @@
 'use client'
 
-import { fetchDataClient } from '../FetchDataClient'
+import { fetchData } from '../FetchData'
 import type { User } from '@/stores/AuthStore'
 
 /**
@@ -12,7 +12,7 @@ export const getCurrentUser = async (): Promise<{
   error?: unknown
 }> => {
   try {
-    const response = await fetchDataClient('/auth/me')
+    const response = await fetchData('/auth/me')
 
     if (response.error) {
       return { error: response.error }

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import yaml
 from pathlib import Path
 
-from app.routers import auth
+from app.routers import auth, settings
 
 app = FastAPI(
     title="MealMind API",
@@ -64,6 +64,7 @@ app.openapi = custom_openapi
 
 # ルーター登録
 app.include_router(auth.router)
+app.include_router(settings.router)
 
 
 @app.on_event("startup")
