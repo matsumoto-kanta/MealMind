@@ -1,5 +1,6 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { messages } from '@/constants/messages'
 import { ERROR_STATUS, SUCCESS_STATUS } from '@/constants/response'
 import { server } from '../mocks/Server'
@@ -30,8 +31,8 @@ export async function fetchData(
 ) {
   try {
     const url = new URL(`${API_BASE_URL}${path}`)
-    // const cookiesStore = cookies();
-    // const accessToken = (await cookiesStore).get('accessToken')?.value;
+    const cookiesStore = cookies();
+    const accessToken = (await cookiesStore).get('accessToken')?.value;
     if (
       params &&
       options?.method !== 'POST' &&
@@ -54,10 +55,11 @@ export async function fetchData(
 
     const fetchOptions: RequestInit = {
       method: options?.method || 'GET',
+      credentials: 'include', // Cookie送信を有効化
       headers: {
         // FormDataの場合はContent-Typeを設定しない（ブラウザが自動設定）
         ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-        // ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : {})
+        ...(accessToken ? {Authorization: `Bearer ${accessToken}`} : {}),
         ...options?.headers,
       },
     }

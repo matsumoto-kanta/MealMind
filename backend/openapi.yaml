@@ -24,7 +24,76 @@ tags:
     description: 設定関連
 
 paths:
-  /logout:
+  /auth/google:
+    get:
+      tags:
+        - auth
+      summary: Google OAuth認証開始
+      description: Googleアカウントでのログインを開始し、Googleのログインページへリダイレクトする
+      operationId: googleLogin
+      responses:
+        '302':
+          description: Googleログインページへリダイレクト
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/google/callback:
+    get:
+      tags:
+        - auth
+      summary: Google OAuth認証コールバック
+      description: Google認証後のコールバックを処理し、JWTトークンを発行してフロントエンドへリダイレクトする
+      operationId: googleCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Googleから返された認証コード
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: CSRF対策用のstateパラメータ
+      responses:
+        '302':
+          description: フロントエンドへリダイレクト（Cookie設定済み）
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: accessToken=xxx; HttpOnly; SameSite=Lax
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/me:
+    get:
+      tags:
+        - auth
+      summary: 現在のユーザー情報取得
+      description: JWTトークンから現在ログイン中のユーザー情報を取得する
+      operationId: getCurrentUser
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: ユーザー情報取得成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /auth/logout:
     post:
       tags:
         - auth
@@ -388,6 +457,33 @@ paths:
 
 components:
   schemas:
+    # 認証・ユーザー関連のスキーマ
+    UserData:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ユーザーID
+          example: 550e8400-e29b-41d4-a716-446655440000
+        email:
+          type: string
+          format: email
+          description: メールアドレス
+          example: user@example.com
+        name:
+          type: string
+          description: ユーザー名
+          example: 山田太郎
+        picture:
+          type: string
+          format: uri
+          description: プロフィール画像URL
+          example: https://lh3.googleusercontent.com/a/example
+
     # 献立関連のスキーマ
     IngredientData:
       type: object
@@ -642,6 +738,17 @@ components:
               description: 詳細なエラー情報
 
   responses:
+    BadRequest:
+      description: リクエストが不正
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error:
+              status: 400
+              messages: リクエストが不正です。
+
     Unauthorized:
       description: 認証エラー
       content:
