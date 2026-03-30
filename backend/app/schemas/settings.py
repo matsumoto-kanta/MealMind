@@ -15,6 +15,7 @@ class ProfileData(BaseModel):
 
 class GoalData(BaseModel):
     target_weight: int = Field(..., ge=20, le=500, alias="targetWeight")
+    target_period_months: int = Field(..., ge=1, le=24, alias="targetPeriodMonths")
 
     class Config:
         populate_by_name = True

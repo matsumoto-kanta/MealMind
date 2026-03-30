@@ -672,11 +672,18 @@ components:
       type: object
       required:
         - targetWeight
+        - targetPeriodMonths
       properties:
         targetWeight:
           type: integer
           description: 目標体重(kg)
           example: 63
+        targetPeriodMonths:
+          type: integer
+          minimum: 1
+          maximum: 24
+          description: 目標達成期間(ヶ月)
+          example: 6
 
     PreferenceData:
       type: object

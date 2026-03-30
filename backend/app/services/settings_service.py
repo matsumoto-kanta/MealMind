@@ -39,6 +39,7 @@ def create_default_settings(db: Session, user_id: UUID) -> UserSettings:
         weight=60,
         activity_level="medium",
         target_weight=60,
+        target_period_months=6,
         disliked_foods=[],
         allergies=[],
     )
@@ -92,6 +93,7 @@ def update_goal(db: Session, user_id: UUID, goal: GoalData) -> UserSettings:
         settings = create_default_settings(db, user_id)
 
     settings.target_weight = goal.target_weight
+    settings.target_period_months = goal.target_period_months
 
     db.commit()
     db.refresh(settings)

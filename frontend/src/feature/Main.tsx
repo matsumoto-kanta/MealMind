@@ -9,7 +9,7 @@ import Settings from './settings/components/Settings'
 import { MealData } from '@/types/Meal'
 import { MonthlyBudgetData } from '@/types/Budget'
 import { SettingsData } from '@/types/Settings'
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import SetUpPopup from '@/components/dialog/SetUpPopup'
 
 interface MainProps {
@@ -38,6 +38,7 @@ export default function Main({
     },
     goal: {
       targetWeight: 0,
+      targetPeriodMonths: 0,
     },
     preference: {
       dislikedFoods: [],
@@ -45,7 +46,7 @@ export default function Main({
     },
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!settings) {
       setTab('settings')
     }

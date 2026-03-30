@@ -29,6 +29,7 @@ def upgrade() -> None:
     sa.Column('weight', sa.Integer(), nullable=False),
     sa.Column('activity_level', sa.Enum('low', 'medium', 'high', name='activitylevelenum'), nullable=False),
     sa.Column('target_weight', sa.Integer(), nullable=False),
+    sa.Column('target_period_months', sa.Integer(), nullable=False),
     sa.Column('disliked_foods', sa.ARRAY(sa.String()), nullable=False),
     sa.Column('allergies', sa.ARRAY(sa.String()), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),

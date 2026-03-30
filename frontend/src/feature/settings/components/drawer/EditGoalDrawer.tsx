@@ -13,32 +13,82 @@ import {
 } from '@/components/ui/drawer'
 import MainButton from '@/components/button/MainButton'
 
+function UnitInput({
+  label,
+  placeholder,
+  value,
+  onChange,
+  unit,
+  inputMode = 'decimal',
+}: {
+  label: string
+  placeholder: string
+  value: string
+  onChange: (value: string) => void
+  unit: string
+  inputMode?: 'numeric' | 'decimal'
+}) {
+  const pattern = inputMode === 'numeric' ? /[^0-9]/g : /[^0-9.]/g
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-[13px] font-medium text-muted-foreground">
+        {label}
+      </label>
+      <div className="relative">
+        <Input
+          type="text"
+          inputMode={inputMode}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value.replace(pattern, ''))}
+          className="text-[16px] pr-12"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">
+          {unit}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 interface EditGoalDrawerProps {
   open: boolean
   setOpen: (open: boolean) => void
   currentTargetWeight: number
-  onSave: (targetWeight: number) => void
+  currentTargetPeriodMonths: number
+  onSave: (targetWeight: number, targetPeriodMonths: number) => void
 }
 
 export default function EditGoalDrawer({
   open,
   setOpen,
   currentTargetWeight,
+  currentTargetPeriodMonths,
   onSave,
 }: EditGoalDrawerProps) {
-  const [value, setValue] = useState(String(currentTargetWeight))
+  const [weightValue, setWeightValue] = useState(String(currentTargetWeight))
+  const [periodValue, setPeriodValue] = useState(
+    String(currentTargetPeriodMonths)
+  )
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen) {
-      setValue(String(currentTargetWeight))
+      setWeightValue(String(currentTargetWeight))
+      setPeriodValue(String(currentTargetPeriodMonths))
     }
     setOpen(newOpen)
   }
 
   const handleSave = () => {
-    const parsed = Number(value)
-    if (!isNaN(parsed) && parsed > 0) {
-      onSave(parsed)
+    const parsedWeight = Number(weightValue)
+    const parsedPeriod = Number(periodValue)
+    if (
+      !isNaN(parsedWeight) &&
+      parsedWeight > 0 &&
+      !isNaN(parsedPeriod) &&
+      parsedPeriod > 0
+    ) {
+      onSave(parsedWeight, parsedPeriod)
       setOpen(false)
     }
   }
@@ -53,24 +103,25 @@ export default function EditGoalDrawer({
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="px-4">
-          <div className="relative">
-            <Input
-              type="text"
-              inputMode="decimal"
-              placeholder={messages.settings.goal.targetWeightPlaceholder}
-              value={value}
-              onChange={(e) => {
-                const v = e.target.value.replace(/[^0-9.]/g, '')
-                setValue(v)
-              }}
-              className="text-[16px] pr-10"
-              autoFocus
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">
-              {messages.settings.unit.kg}
-            </span>
-          </div>
+        <div className="px-4 flex flex-col gap-5">
+          {/* 目標体重 */}
+          <UnitInput
+            label={messages.settings.goal.targetWeight}
+            placeholder={messages.settings.goal.targetWeightPlaceholder}
+            value={weightValue}
+            onChange={setWeightValue}
+            unit={messages.settings.unit.kg}
+          />
+
+          {/* 目標達成期間 */}
+          <UnitInput
+            label={messages.settings.goal.targetPeriod}
+            placeholder={messages.settings.goal.targetPeriodPlaceholder}
+            value={periodValue}
+            onChange={setPeriodValue}
+            unit={messages.settings.unit.months}
+            inputMode="numeric"
+          />
         </div>
 
         <DrawerFooter className="py-6 flex-row">

@@ -20,6 +20,10 @@ export default function Goal({ goal, currentWeight, onEdit }: GoalProps) {
       value: `${goal.targetWeight}${messages.settings.unit.kg}`,
     },
     {
+      label: messages.settings.goal.targetPeriod,
+      value: `${goal.targetPeriodMonths}${messages.settings.unit.months}`,
+    },
+    {
       label: messages.settings.goal.diff,
       value: `${diffLabel}${messages.settings.unit.kg}`,
     },

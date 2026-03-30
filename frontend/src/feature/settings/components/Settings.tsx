@@ -32,8 +32,11 @@ export default function Settings({ settings }: SettingsProps) {
   }
 
   // 目標更新
-  const handleSaveGoal = async (targetWeight: number) => {
-    const response = await putGoal({ targetWeight })
+  const handleSaveGoal = async (
+    targetWeight: number,
+    targetPeriodMonths: number
+  ) => {
+    const response = await putGoal({ targetWeight, targetPeriodMonths })
     if (response) {
       setData(response)
     }
@@ -81,6 +84,7 @@ export default function Settings({ settings }: SettingsProps) {
         open={goalDrawerOpen}
         setOpen={setGoalDrawerOpen}
         currentTargetWeight={data.goal.targetWeight}
+        currentTargetPeriodMonths={data.goal.targetPeriodMonths}
         onSave={handleSaveGoal}
       />
 

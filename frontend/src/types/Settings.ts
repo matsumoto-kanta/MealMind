@@ -11,6 +11,7 @@ export interface ProfileData {
 
 export interface GoalData {
   targetWeight: number
+  targetPeriodMonths: number
 }
 
 export interface PreferenceData {

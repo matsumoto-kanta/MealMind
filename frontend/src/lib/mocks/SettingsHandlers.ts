@@ -18,6 +18,7 @@ let settings: SettingsData = {
   },
   goal: {
     targetWeight: 63,
+    targetPeriodMonths: 6,
   },
   preference: {
     dislikedFoods: ['パクチー', 'セロリ', 'パセリ', '牡蠣'],
