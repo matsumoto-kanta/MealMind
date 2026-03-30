@@ -9,7 +9,7 @@
 - **SQLAlchemy** - ORM
 - **Cloud SQL (PostgreSQL)** - データベース (Google Cloud)
 - **Google OAuth 2.0** - 認証
-- **OpenAI API** - AI献立生成
+- **Google Gemini API** - AI献立生成
 - **Cloud Run** - コンテナホスティング (Google Cloud)
 - **Cloud Storage** - ファイルストレージ (オプション)
 
@@ -413,8 +413,8 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 REFRESH_TOKEN_EXPIRE_DAYS=30
 
-# OpenAI
-OPENAI_API_KEY=your_openai_api_key
+# Google Gemini
+GEMINI_API_KEY=your_gemini_api_key
 
 # CORS
 FRONTEND_URL=http://localhost:3000
@@ -498,7 +498,7 @@ GCS_BUCKET_NAME=your-bucket-name
 
 ## AI献立生成ロジック
 
-OpenAI APIを使用して献立を生成します。
+Google Gemini APIを使用して献立を生成します。
 
 ### プロンプト例
 
@@ -590,12 +590,12 @@ gcloud run deploy mealmind-backend \
 
 ```bash
 # シークレットを作成
-echo -n "your-openai-api-key" | gcloud secrets create openai-api-key --data-file=-
+echo -n "your-gemini-api-key" | gcloud secrets create gemini-api-key --data-file=-
 echo -n "your-secret-key" | gcloud secrets create jwt-secret-key --data-file=-
 
 # Cloud Runにシークレットをマウント
 gcloud run services update mealmind-backend \
-  --update-secrets OPENAI_API_KEY=openai-api-key:latest \
+  --update-secrets GEMINI_API_KEY=gemini-api-key:latest \
   --update-secrets SECRET_KEY=jwt-secret-key:latest
 ```
 
@@ -615,7 +615,7 @@ gcloud run services update mealmind-backend \
          │
          ├─────▶ Google OAuth 2.0
          │
-         └─────▶ OpenAI API
+         └─────▶ Google Gemini API
 ```
 
 ## ライセンス

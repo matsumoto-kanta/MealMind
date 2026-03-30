@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str
 
+    # Gemini API
+    GEMINI_API_KEY: str
+
     class Config:
         env_file = ".env"
         case_sensitive = True
