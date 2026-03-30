@@ -77,6 +77,7 @@ class GoogleAuthService:
                 credentials.id_token,
                 requests.Request(),
                 settings.GOOGLE_CLIENT_ID,
+                clock_skew_in_seconds=300,  # 5分の時計のずれを許容
             )
 
             # ユーザー情報を抽出

@@ -25,44 +25,60 @@
 #### 方法1: ローカルPython環境で開発
 
 ```bash
-# Pythonの仮想環境を作成
+# 1. Pythonの仮想環境を作成
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 依存関係をインストール
+# 2. 依存関係をインストール
 pip install -r requirements.txt
 
-# 環境変数を設定
+# 3. 環境変数を設定
 cp .env.example .env
 # .env ファイルを編集して必要な設定を入力
 
-# データベースのマイグレーション
+# 4. PostgreSQLが起動していることを確認
+# brew services list | grep postgresql
+
+# 5. 【初回のみ】データベースを作成（docker-composeを使わない場合）
+createdb -U postgres mealmind
+
+# 6. 【初回のみ】データベースのマイグレーション
 alembic upgrade head
 
-# 開発サーバーを起動
+# 7. 開発サーバーを起動
 uvicorn app.main:app --reload --port 8000
 ```
 
 #### 方法2: Rancher Desktopでコンテナ開発 (ローカルDB)
 
 ```bash
-# 環境変数を設定
+# 1. 環境変数を設定
 cp .env.example .env
 # .env ファイルを編集
 
-# docker-compose を使用 (推奨)
+# 2. docker-compose を使用してコンテナを起動 (推奨)
 docker-compose up -d
 
-# ログを確認
+# 3. 【初回のみ】データベースのマイグレーションを実行
+docker-compose exec backend alembic upgrade head
+
+# 4. ログを確認
 docker-compose logs -f backend
 
-# 停止
+# 5. 停止
 docker-compose down
 
 # データベース管理ツール (pgAdmin) も起動する場合
 docker-compose --profile tools up -d
 # pgAdmin: http://localhost:5050 (admin@mealmind.local / admin)
 ```
+
+**⚠️ 重要: 初回セットアップ時の注意点**
+- `alembic upgrade head` は**初回のみ**実行が必要です
+- データベースのデータは `postgres_data` ボリュームで永続化されるため、2回目以降のコンテナ起動時は不要です
+- ただし、以下の場合は再実行が必要です：
+  - `docker-compose down -v` でボリュームを削除した場合
+  - 新しいマイグレーションファイルが追加された場合
 
 #### 方法3: Cloud SQLに接続して開発 (本番環境と同じDB)
 
