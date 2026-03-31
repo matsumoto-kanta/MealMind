@@ -13,10 +13,10 @@ import { useLayoutEffect, useState } from 'react'
 import SetUpPopup from '@/components/dialog/SetUpPopup'
 
 interface MainProps {
-  meals: MealData | null
+  meals: MealData
   history: MealData[]
   monthlyBudget: MonthlyBudgetData
-  settings: SettingsData | null
+  settings: SettingsData
 }
 
 export default function Main({
@@ -26,28 +26,12 @@ export default function Main({
   settings,
 }: MainProps) {
   const [tab, setTab] = useAtom(tabAtom)
-  const [setUpPopupOpen, setSetUpPopupOpen] = useState<boolean>(!settings)
-
-  const defaultSettings: SettingsData = {
-    profile: {
-      gender: 'male',
-      age: 0,
-      height: 0,
-      weight: 0,
-      activityLevel: 'low',
-    },
-    goal: {
-      targetWeight: 0,
-      targetPeriodMonths: 0,
-    },
-    preference: {
-      dislikedFoods: [],
-      allergies: [],
-    },
-  }
+  const [setUpPopupOpen, setSetUpPopupOpen] = useState<boolean>(
+    settings?.profile?.age === 0
+  )
 
   useLayoutEffect(() => {
-    if (!settings) {
+    if (settings?.profile?.age === 0) {
       setTab('settings')
     }
   }, [settings, setTab])
@@ -59,7 +43,7 @@ export default function Main({
       ) : tab === 'history' ? (
         <History history={history} />
       ) : tab === 'settings' ? (
-        <Settings settings={settings ?? defaultSettings} />
+        <Settings settings={settings} />
       ) : (
         <Dashboard meals={meals} />
       )}

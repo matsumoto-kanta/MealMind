@@ -33,13 +33,13 @@ def create_default_settings(db: Session, user_id: UUID) -> UserSettings:
     """
     settings = UserSettings(
         user_id=user_id,
-        gender="other",
-        age=25,
-        height=170,
-        weight=60,
-        activity_level="medium",
-        target_weight=60,
-        target_period_months=6,
+        gender="male",
+        age=0,
+        height=0,
+        weight=0,
+        activity_level="low",
+        target_weight=0,
+        target_period_months=0,
         disliked_foods=[],
         allergies=[],
     )

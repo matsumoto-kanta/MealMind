@@ -128,5 +128,10 @@ export const messages = {
     editBudget: '今月の予算を編集',
     save: '保存',
     budgetPlaceholder: '今月の予算を入力',
+    noHistory: 'まだ予算の履歴がありません',
+  },
+  history: {
+    noHistory: 'まだ食事の履歴がありません',
+    noHistoryDescription: '食事を登録すると、ここに表示されます',
   },
 }

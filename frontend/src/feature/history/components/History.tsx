@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { messages } from '@/constants/messages'
 import useOpenCards from '@/hooks/useOpenCards'
 import { postHistory } from '@/lib/api/history/postHistory'
 import { MealData } from '@/types/Meal'
@@ -77,43 +78,55 @@ export default function History({ history }: HistoryProps) {
 
   return (
     <div className="flex flex-col">
-      <Accordion
-        type="single"
-        collapsible
-        onValueChange={() => setOpenCardIds(new Set())}
-      >
-        {items.map((item, index) => (
-          <AccordionItem
-            key={item.date}
-            value={item.date + String(index)}
-            className="border-0"
+      {items.length === 0 ? (
+        <div className="flex items-center justify-center h-[50vh] text-muted-foreground">
+          <p className="text-center">
+            {messages.history.noHistory}
+            <br />
+            {messages.history.noHistoryDescription}
+          </p>
+        </div>
+      ) : (
+        <>
+          <Accordion
+            type="single"
+            collapsible
+            onValueChange={() => setOpenCardIds(new Set())}
           >
-            <AccordionTrigger className="text-[16px] font-semibold px-2 hover:no-underline">
-              {item.date}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar flex-col">
-                {item.detail.map((meal) => (
-                  <div key={meal.id} className="snap-center">
-                    <MealCard
-                      status="fixed"
-                      meal={meal}
-                      handleRegeneration={handleRegeneration}
-                      handleConfirmed={handleConfirmed}
-                      handleClick={handleClick}
-                      openCardIds={openCardIds}
-                      cardClassName="py-2"
-                    />
+            {items.map((item, index) => (
+              <AccordionItem
+                key={item.date}
+                value={item.date + String(index)}
+                className="border-0"
+              >
+                <AccordionTrigger className="text-[16px] font-semibold px-2 hover:no-underline">
+                  {item.date}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar flex-col">
+                    {item.detail.map((meal) => (
+                      <div key={meal.id} className="snap-center">
+                        <MealCard
+                          status="fixed"
+                          meal={meal}
+                          handleRegeneration={handleRegeneration}
+                          handleConfirmed={handleConfirmed}
+                          handleClick={handleClick}
+                          openCardIds={openCardIds}
+                          cardClassName="py-2"
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
 
-      {/* スクロールセンサー */}
-      {hasMore && <div ref={loadMoreRef} />}
+          {/* スクロールセンサー */}
+          {hasMore && <div ref={loadMoreRef} />}
+        </>
+      )}
     </div>
   )
 }
