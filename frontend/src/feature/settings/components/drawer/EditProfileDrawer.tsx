@@ -49,13 +49,12 @@ export default function EditProfileDrawer({
   )
 
   const handleOpenChange = (value: boolean) => {
-    if (value) {
-      setGender(profile.gender)
-      setAge(String(profile.age))
-      setHeight(String(profile.height))
-      setWeight(String(profile.weight))
-      setActivityLevel(profile.activityLevel)
-    }
+    // 開くときも閉じるときも元の値にリセット
+    setGender(profile.gender)
+    setAge(String(profile.age))
+    setHeight(String(profile.height))
+    setWeight(String(profile.weight))
+    setActivityLevel(profile.activityLevel)
     setOpen(value)
   }
 

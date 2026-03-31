@@ -33,10 +33,9 @@ export default function EditPreferenceDrawer({
   const [allergies, setAllergies] = useState<string[]>(preference.allergies)
 
   const handleOpenChange = (value: boolean) => {
-    if (value) {
-      setDislikedFoods(preference.dislikedFoods)
-      setAllergies(preference.allergies)
-    }
+    // 開くときも閉じるときも元の値にリセット
+    setDislikedFoods(preference.dislikedFoods)
+    setAllergies(preference.allergies)
     setOpen(value)
   }
 
