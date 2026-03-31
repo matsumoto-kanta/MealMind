@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { messages } from '@/constants/messages'
-import { Input } from '@/components/ui/input'
 import {
   Drawer,
   DrawerContent,
@@ -13,7 +12,8 @@ import {
 } from '@/components/ui/drawer'
 import MainButton from '@/components/button/MainButton'
 import { ProfileData, Gender, ActivityLevel } from '@/types/Settings'
-import { Button } from '@/components/ui/button'
+import UnitInput from '../input/UnitInput'
+import SegmentedControl from '../input/SegmentedControl'
 
 interface EditProfileDrawerProps {
   open: boolean
@@ -33,80 +33,6 @@ const activityOptions: { value: ActivityLevel; label: string }[] = [
   { value: 'medium', label: messages.settings.profile.activityMedium },
   { value: 'high', label: messages.settings.profile.activityHigh },
 ]
-
-function SegmentedControl<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string
-  options: { value: T; label: string }[]
-  value: T
-  onChange: (value: T) => void
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-[13px] font-medium text-muted-foreground">
-        {label}
-      </label>
-      <div className="flex gap-2">
-        {options.map((option) => (
-          <Button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={`h-10.5 flex-1 py-2.5 rounded-lg text-[14px] font-medium transition-colors border ${
-              value === option.value
-                ? 'bg-primary text-accent-foreground border-primary'
-                : 'bg-muted/50 text-muted-foreground border-transparent hover:text-accent-foreground'
-            }`}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function UnitInput({
-  label,
-  placeholder,
-  value,
-  onChange,
-  unit,
-  inputMode = 'decimal',
-}: {
-  label: string
-  placeholder: string
-  value: string
-  onChange: (value: string) => void
-  unit: string
-  inputMode?: 'numeric' | 'decimal'
-}) {
-  const pattern = inputMode === 'numeric' ? /[^0-9]/g : /[^0-9.]/g
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="text-[13px] font-medium text-muted-foreground">
-        {label}
-      </label>
-      <div className="relative">
-        <Input
-          type="text"
-          inputMode={inputMode}
-          placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value.replace(pattern, ''))}
-          className="text-[16px] pr-12"
-        />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-[14px]">
-          {unit}
-        </span>
-      </div>
-    </div>
-  )
-}
 
 export default function EditProfileDrawer({
   open,
