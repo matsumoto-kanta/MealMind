@@ -20,3 +20,4 @@ class User(Base):
 
     # Relationships
     settings = relationship("UserSettings", back_populates="user", uselist=False)
+    monthly_budgets = relationship("MonthlyBudget", back_populates="user")

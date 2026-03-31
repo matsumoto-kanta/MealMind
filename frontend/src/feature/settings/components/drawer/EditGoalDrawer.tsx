@@ -34,10 +34,9 @@ export default function EditGoalDrawer({
   )
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (newOpen) {
-      setWeightValue(String(currentTargetWeight))
-      setPeriodValue(String(currentTargetPeriodMonths))
-    }
+    // 開くときも閉じるときも元の値にリセット
+    setWeightValue(String(currentTargetWeight))
+    setPeriodValue(String(currentTargetPeriodMonths))
     setOpen(newOpen)
   }
 

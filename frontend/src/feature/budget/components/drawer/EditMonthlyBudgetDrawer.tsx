@@ -28,16 +28,22 @@ export default function EditMonthlyBudgetDrawer({
 }: EditMonthlyBudgetDrawerProps) {
   const [value, setValue] = useState(String(currentBudget))
 
+  const handleOpenChange = (open: boolean) => {
+    // 開くときも閉じるときも元の値にリセット
+    setValue(String(currentBudget))
+    setOpen(open)
+  }
+
   const handleSave = () => {
     const parsed = Number(value)
-    if (!isNaN(parsed) && parsed >= 0) {
+    if (!isNaN(parsed) && parsed > 0) {
       onSave(parsed)
       setOpen(false)
     }
   }
 
   return (
-    <Drawer open={open} onOpenChange={(value) => setOpen(value)}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       <DrawerContent className="mx-auto max-w-107.5">
         <DrawerHeader className="py-6">
           <DrawerTitle>{messages.budget.editBudget}</DrawerTitle>
@@ -55,7 +61,7 @@ export default function EditMonthlyBudgetDrawer({
               type="text"
               inputMode="numeric"
               placeholder={messages.budget.budgetPlaceholder}
-              value={Number(value).toLocaleString()}
+              value={value}
               onChange={(e) => {
                 const v = e.target.value.replace(/[^0-9]/g, '')
                 setValue(v)
