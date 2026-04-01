@@ -11,6 +11,11 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: 'MealMind',
   description: '予算と体型から逆算して、今日の食事を決めてくれるAI栄養士',
+  icons: {
+    icon: '/icon-1.jpg',
+    shortcut: '/icon-1.jpg',
+    apple: '/icon-1.jpg',
+  },
 }
 
 export default function RootLayout({

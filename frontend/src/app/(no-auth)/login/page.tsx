@@ -15,7 +15,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       {/* ロゴ */}
       <div>
-        <Image src="/meal-mind.PNG" width={1536} height={1024} alt="ロゴ" />
+        <Image src="/logo-1.PNG" width={1536} height={1024} alt="ロゴ" />
       </div>
 
       {/* キャッチコピー */}
@@ -29,8 +29,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <Button
           onClick={handleGoogleLogin}
-          className="h-12 w-full bg-background text-foreground border border-border hover:bg-muted/80 transition-colors"
-          size="lg"
+          className="w-full h-14 rounded-2xl text-[16px] font-medium shadow-sm bg-background text-foreground border border-border hover:bg-muted/80 transition-colors"
         >
           <svg
             className="mr-3 h-5 w-5"
