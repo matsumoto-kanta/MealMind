@@ -8,7 +8,7 @@ import { SettingsData } from '@/types/Settings'
 import { getSettings } from '@/lib/api/settings/getSettings'
 
 export default async function MainData() {
-  let meals: MealData | null
+  let meals: MealData
   let history: MealData[]
   let monthlyBudget: MonthlyBudgetData
   let settings: SettingsData

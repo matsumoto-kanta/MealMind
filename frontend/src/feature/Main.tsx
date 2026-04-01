@@ -9,8 +9,9 @@ import Settings from './settings/components/Settings'
 import { MealData } from '@/types/Meal'
 import { MonthlyBudgetData } from '@/types/Budget'
 import { SettingsData } from '@/types/Settings'
-import { useLayoutEffect, useState } from 'react'
-import SetUpPopup from '@/components/dialog/SetUpPopup'
+import InfoPopup from '@/components/dialog/SetUpPopup'
+import { Handshake, Wallet } from 'lucide-react'
+import { messages } from '@/constants/messages'
 
 interface MainProps {
   meals: MealData
@@ -26,15 +27,30 @@ export default function Main({
   settings,
 }: MainProps) {
   const [tab, setTab] = useAtom(tabAtom)
-  const [setUpPopupOpen, setSetUpPopupOpen] = useState<boolean>(
-    settings?.profile?.age === 0
-  )
 
-  useLayoutEffect(() => {
-    if (settings?.profile?.age === 0) {
-      setTab('settings')
-    }
-  }, [settings, setTab])
+  // 設定未完了の判定（年齢、目標体重、目標達成期間がすべて1以上である必要がある）
+  const isSettingsIncomplete =
+    settings?.profile?.age < 1 ||
+    settings?.goal?.targetWeight < 1 ||
+    settings?.goal?.targetPeriodMonths < 1
+
+  // 予算未設定の判定
+  const isBudgetNotSet = monthlyBudget?.monthlyBudget === 0
+
+  // 設定未完了かつ設定タブ以外の場合、設定ポップアップを表示
+  const settingsPopupOpen = isSettingsIncomplete && tab !== 'settings'
+
+  // 設定完了済み、予算未設定、予算タブ以外の場合、予算ポップアップを表示
+  const budgetPopupOpen =
+    !isSettingsIncomplete && isBudgetNotSet && tab !== 'budget'
+
+  const handleSettingsConfirm = () => {
+    setTab('settings')
+  }
+
+  const handleBudgetConfirm = () => {
+    setTab('budget')
+  }
 
   return (
     <>
@@ -48,7 +64,25 @@ export default function Main({
         <Dashboard meals={meals} />
       )}
 
-      <SetUpPopup open={setUpPopupOpen} setOpen={setSetUpPopupOpen} />
+      {/* 設定未完了ポップアップ */}
+      <InfoPopup
+        open={settingsPopupOpen}
+        onConfirm={handleSettingsConfirm}
+        title={messages.settings.popup.title}
+        description={messages.settings.popup.description}
+        buttonLabel={messages.settings.popup.button}
+        icon={Handshake}
+      />
+
+      {/* 予算未設定ポップアップ */}
+      <InfoPopup
+        open={budgetPopupOpen}
+        onConfirm={handleBudgetConfirm}
+        title={messages.budget.popup.title}
+        description={messages.budget.popup.description}
+        buttonLabel={messages.budget.popup.button}
+        icon={Wallet}
+      />
     </>
   )
 }

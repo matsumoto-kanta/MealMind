@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { SettingsData, ProfileData, PreferenceData } from '@/types/Settings'
 import Profile from './item/Profile'
 import Goal from './item/Goal'
@@ -18,6 +19,7 @@ interface SettingsProps {
 }
 
 export default function Settings({ settings }: SettingsProps) {
+  const router = useRouter()
   const [data, setData] = useState<SettingsData>(settings)
   const [profileDrawerOpen, setProfileDrawerOpen] = useState(false)
   const [goalDrawerOpen, setGoalDrawerOpen] = useState(false)
@@ -28,6 +30,7 @@ export default function Settings({ settings }: SettingsProps) {
     const response = await putProfile(profile)
     if (response) {
       setData(response)
+      router.refresh()
     }
   }
 
@@ -39,6 +42,7 @@ export default function Settings({ settings }: SettingsProps) {
     const response = await putGoal({ targetWeight, targetPeriodMonths })
     if (response) {
       setData(response)
+      router.refresh()
     }
   }
 
@@ -47,6 +51,7 @@ export default function Settings({ settings }: SettingsProps) {
     const response = await putPreference(preference)
     if (response) {
       setData(response)
+      router.refresh()
     }
   }
 

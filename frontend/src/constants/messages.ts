@@ -128,6 +128,12 @@ export const messages = {
     editBudget: '今月の予算を編集',
     save: '保存',
     budgetPlaceholder: '今月の予算を入力',
+    popup: {
+      title: '予算を登録しましょう',
+      description:
+        '月間予算を設定すると、\n1日あたりの食費の目安が自動で計算されます。',
+      button: '予算を登録する',
+    },
   },
   history: {
     noHistory: 'まだ食事の履歴がありません',

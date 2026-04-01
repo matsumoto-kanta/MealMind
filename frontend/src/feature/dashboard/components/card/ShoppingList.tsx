@@ -72,8 +72,8 @@ export default function ShoppingList({
               key={ing.name}
               className={`grid items-center py-3 border-b border-muted-foreground/20 last:border-none transition-all duration-200 ${
                 showCheck
-                  ? 'grid-cols-[28px_1fr_100px_68px]'
-                  : 'grid-cols-[1fr_100px_68px]'
+                  ? 'grid-cols-[28px_1fr_144px_68px]'
+                  : 'grid-cols-[1fr_144px_68px]'
               }`}
             >
               {showCheck && (

@@ -44,11 +44,24 @@ def update_monthly_budget(
     """
     try:
         user_id = UUID(current_user["sub"])
+
+        # 設定が完了しているかチェック
+        from app.services import settings_service
+
+        settings = settings_service.get_user_settings(db, user_id)
+        if not settings or settings.age == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="初期設定を完了してください",
+            )
+
         budget_data = budget_service.update_monthly_budget(
             db, user_id, request.monthly_budget
         )
 
         return {"monthlyBudget": budget_data}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

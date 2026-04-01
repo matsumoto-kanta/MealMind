@@ -3,14 +3,14 @@ import TitleAndButton from '@/components/button/TitleAndButton'
 import { MealData } from '@/types/Meal'
 import MealCard from '@/components/card/MealCard'
 import { Utensils } from 'lucide-react'
-import { useState } from 'react'
 import MainButton from '@/components/button/MainButton'
 
 interface MealCardsProps {
-  meals: MealData | null
+  meals: MealData
   onEditOpen: () => void | Promise<void>
   handleClick: (id: string) => void
   openCardIds: Set<string>
+  isGenerating: boolean
 }
 
 export default function MealCards({
@@ -18,26 +18,17 @@ export default function MealCards({
   onEditOpen,
   handleClick,
   openCardIds,
+  isGenerating,
 }: MealCardsProps) {
-  const [pending, setPending] = useState(false)
-
-  const handleGenerate = async () => {
-    setPending(true)
-    try {
-      await onEditOpen()
-    } finally {
-      setPending(false)
-    }
-  }
-
   return (
     <div className="flex flex-col gap-5 text-foreground">
-      {meals ? (
+      {meals.detail.length > 0 ? (
         <>
           <TitleAndButton
             title={messages.dashboard.todayMenu}
             onClick={onEditOpen}
             buttonLabel={messages.dashboard.edit}
+            disabled={isGenerating}
           />
 
           <div className="flex flex-row gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
@@ -65,8 +56,8 @@ export default function MealCards({
             <MainButton
               variant="primary"
               label={messages.dashboard.generateMenu}
-              onClick={handleGenerate}
-              disabled={pending}
+              onClick={onEditOpen}
+              disabled={isGenerating}
             />
           </div>
         </div>
