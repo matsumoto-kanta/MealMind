@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import MonthlyBudget from './item/MonthlyBudget'
 import { MonthlyBudgetData } from '@/types/Budget'
 import BudgetHistory from './item/BudgetHistory'
@@ -12,6 +13,7 @@ interface BudgetProps {
 }
 
 export default function Budget({ monthlyBudget }: BudgetProps) {
+  const router = useRouter()
   const [budgetData, setBudgetData] = useState<MonthlyBudgetData>(monthlyBudget)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -19,6 +21,7 @@ export default function Budget({ monthlyBudget }: BudgetProps) {
     const response = await putMonthlyBudget(newBudget)
     if (response) {
       setBudgetData(response)
+      router.refresh()
     }
   }
 

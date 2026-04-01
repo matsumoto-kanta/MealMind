@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str
 
     # Gemini API
-    GEMINI_API_KEY: str | None = None
+    GEMINI_API_KEY: str
 
     class Config:
         env_file = ".env"

@@ -32,5 +32,5 @@ class MonthlyBudget(Base):
 
     # Unique constraint: one budget per user per month
     __table_args__ = (
-        UniqueConstraint('user_id', 'year_month', name='uq_user_year_month'),
+        UniqueConstraint("user_id", "year_month", name="uq_user_year_month"),
     )

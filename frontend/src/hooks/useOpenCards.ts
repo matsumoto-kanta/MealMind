@@ -1,7 +1,8 @@
 import { postRegeneration } from '@/lib/api/dashboard/postRegeneration'
 import { putConfirmed } from '@/lib/api/dashboard/putConfirmed'
 import { ShoppingListCheckAtom } from '@/stores/ShoppingListCheckStore'
-import { MealData } from '@/types/Meal'
+import { loadingCardIdAtom } from '@/stores/LoadingStore'
+import { MealData, MealDetailData } from '@/types/Meal'
 import { useAtom } from 'jotai'
 import { useRef, useState } from 'react'
 
@@ -31,8 +32,14 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
   const [regeneratedCardIds, setRegeneratedCardIds] = useState<Set<string>>(
     new Set()
   )
+  // 再生成されたmealのデータを保持
+  const [regeneratedMealsData, setRegeneratedMealsData] = useState<
+    Map<string, MealDetailData>
+  >(new Map())
   // 再生成API呼び出しフラグ
   const hasRegeneratedRef = useRef(false)
+  // 再生成中のカードID（ローディング表示用）- グローバルステートで管理
+  const [loadingCardId, setLoadingCardId] = useAtom(loadingCardIdAtom)
 
   // チェックボックス表示
   const [showCheck, setShowCheck] = useState(false)
@@ -62,11 +69,22 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
    * @param id - 対象の meal カード ID
    */
   const handleRegeneration = async (id: string) => {
-    const response = await postRegeneration(id)
-    if (response) {
-      setOpenCardIds((prev) => new Set(prev).add(id))
-      setRegeneratedCardIds((prev) => new Set(prev).add(id))
-      hasRegeneratedRef.current = true
+    setLoadingCardId(id)
+    try {
+      const response = await postRegeneration(id)
+      if (response) {
+        setOpenCardIds((prev) => new Set(prev).add(id))
+        setRegeneratedCardIds((prev) => new Set(prev).add(id))
+        // 再生成されたmealのデータを保存
+        setRegeneratedMealsData((prev) => {
+          const next = new Map(prev)
+          next.set(id, response)
+          return next
+        })
+        hasRegeneratedRef.current = true
+      }
+    } finally {
+      setLoadingCardId(null)
     }
   }
 
@@ -90,6 +108,7 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
   const resetConfirmedCardIds = () => {
     setConfirmedCardIds(new Set())
     setRegeneratedCardIds(new Set())
+    setRegeneratedMealsData(new Map())
   }
 
   return {
@@ -104,7 +123,9 @@ export default function useOpenCards({ meals }: UseOpenCardsProps) {
     handleConfirmed,
     confirmedCardIds,
     regeneratedCardIds,
+    regeneratedMealsData,
     hasRegeneratedRef,
     resetConfirmedCardIds,
+    loadingCardId,
   }
 }

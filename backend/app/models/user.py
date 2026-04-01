@@ -16,8 +16,11 @@ class User(Base):
     name = Column(String, nullable=True)
     picture = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     # Relationships
     settings = relationship("UserSettings", back_populates="user", uselist=False)
     monthly_budgets = relationship("MonthlyBudget", back_populates="user")
+    meals = relationship("Meal", back_populates="user")

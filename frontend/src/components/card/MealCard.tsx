@@ -19,6 +19,7 @@ interface MealCardProps {
   handleClick: (id: string) => void
   openCardIds: Set<string>
   cardClassName?: string
+  isLoading?: boolean
 }
 
 export default function MealCard({
@@ -29,6 +30,7 @@ export default function MealCard({
   handleClick,
   openCardIds,
   cardClassName,
+  isLoading = false,
 }: MealCardProps) {
   const mealLabel = {
     breakfast: (
@@ -144,12 +146,14 @@ export default function MealCard({
               variant="destructive"
               label={messages.dashboard.regeneration}
               onClick={() => handleRegeneration(meal.id)}
+              disabled={isLoading}
             />
             {status === 'draft' && (
               <MainButton
                 variant="primary"
                 label={messages.dashboard.confirmed}
                 onClick={() => handleConfirmed(meal.id)}
+                disabled={isLoading}
               />
             )}
           </CardFooter>

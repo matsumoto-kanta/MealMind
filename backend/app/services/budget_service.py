@@ -35,8 +35,7 @@ def get_monthly_budget_record(
     return (
         db.query(MonthlyBudget)
         .filter(
-            MonthlyBudget.user_id == user_id,
-            MonthlyBudget.year_month == year_month
+            MonthlyBudget.user_id == user_id, MonthlyBudget.year_month == year_month
         )
         .first()
     )
@@ -61,10 +60,7 @@ def get_or_create_monthly_budget_record(
 
     if not record:
         record = MonthlyBudget(
-            user_id=user_id,
-            year_month=year_month,
-            monthly_budget=budget,
-            spent=0
+            user_id=user_id, year_month=year_month, monthly_budget=budget, spent=0
         )
         db.add(record)
         db.commit()
@@ -102,7 +98,9 @@ def get_remaining_days_in_month() -> int:
     return max(1, remaining)
 
 
-def get_budget_history(db: Session, user_id: UUID, limit: int = 6) -> List[BudgetHistoryItem]:
+def get_budget_history(
+    db: Session, user_id: UUID, limit: int = 6
+) -> List[BudgetHistoryItem]:
     """
     予算履歴を取得（最新N件）
 
@@ -126,7 +124,7 @@ def get_budget_history(db: Session, user_id: UUID, limit: int = 6) -> List[Budge
         BudgetHistoryItem(
             year_month=record.year_month,
             budget=record.monthly_budget,
-            spent=record.spent
+            spent=record.spent,
         )
         for record in records
     ]
@@ -143,14 +141,44 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
     Returns:
         月間予算データ
     """
+    from datetime import date
+    from app.models.meal import Meal
+
     current_year_month = get_current_year_month()
-    current_record = get_or_create_monthly_budget_record(db, user_id, current_year_month)
+    # GET APIではレコードを自動作成しない
+    current_record = get_monthly_budget_record(db, user_id, current_year_month)
+
+    # レコードが存在しない場合は初期値を返す
+    if not current_record:
+        history = get_budget_history(db, user_id)
+        return MonthlyBudgetData(
+            monthly_budget=0,
+            remaining_monthly_budget=0,
+            today_budget=0,
+            history=history,
+        )
 
     # 残り予算を計算
-    # NOTE: spentは献立生成時に今日の金額を累積加算していく（月替わりでリセット）
-    # - 献立生成API: todayBudgetを計算 → spentに加算
+    # NOTE: spentは献立確定時に累積加算していく（月替わりで自動リセット）
+    # - 献立確定API: spentに加算
     # - remainingMonthlyBudget: グラフ表示用に月間予算から使用済み金額を引いた額
     remaining_budget = max(0, current_record.monthly_budget - current_record.spent)
+
+    # 今日の献立が存在するかチェック（draft状態でも可）
+    today = date.today()
+    today_meals_exist = (
+        db.query(Meal)
+        .filter(Meal.user_id == user_id, Meal.meal_date == today)
+        .first()
+        is not None
+    )
+
+    # 献立が存在する場合のみ今日の予算を計算、存在しない場合は0
+    if today_meals_exist:
+        remaining_days = get_remaining_days_in_month()
+        today_budget = calculate_today_budget(remaining_budget, remaining_days)
+    else:
+        today_budget = 0
 
     # 履歴を取得
     history = get_budget_history(db, user_id)
@@ -158,12 +186,14 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
     return MonthlyBudgetData(
         monthly_budget=current_record.monthly_budget,
         remaining_monthly_budget=remaining_budget,
-        today_budget=0,  # 今日の予算は別APIで管理
-        history=history
+        today_budget=today_budget,
+        history=history,
     )
 
 
-def update_monthly_budget(db: Session, user_id: UUID, new_budget: int) -> MonthlyBudgetData:
+def update_monthly_budget(
+    db: Session, user_id: UUID, new_budget: int
+) -> MonthlyBudgetData:
     """
     月間予算を更新
 
@@ -176,7 +206,9 @@ def update_monthly_budget(db: Session, user_id: UUID, new_budget: int) -> Monthl
         更新後の月間予算データ
     """
     current_year_month = get_current_year_month()
-    record = get_or_create_monthly_budget_record(db, user_id, current_year_month, new_budget)
+    record = get_or_create_monthly_budget_record(
+        db, user_id, current_year_month, new_budget
+    )
 
     # 予算を更新
     record.monthly_budget = new_budget

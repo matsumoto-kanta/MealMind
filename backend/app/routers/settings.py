@@ -79,9 +79,9 @@ def update_profile(
                 "activityLevel": settings.activity_level.value,
             },
             goal={
-            "targetWeight": settings.target_weight,
-            "targetPeriodMonths": settings.target_period_months,
-        },
+                "targetWeight": settings.target_weight,
+                "targetPeriodMonths": settings.target_period_months,
+            },
             preference={
                 "dislikedFoods": settings.disliked_foods,
                 "allergies": settings.allergies,
@@ -121,9 +121,9 @@ def update_goal(
                 "activityLevel": settings.activity_level.value,
             },
             goal={
-            "targetWeight": settings.target_weight,
-            "targetPeriodMonths": settings.target_period_months,
-        },
+                "targetWeight": settings.target_weight,
+                "targetPeriodMonths": settings.target_period_months,
+            },
             preference={
                 "dislikedFoods": settings.disliked_foods,
                 "allergies": settings.allergies,
@@ -163,9 +163,9 @@ def update_preference(
                 "activityLevel": settings.activity_level.value,
             },
             goal={
-            "targetWeight": settings.target_weight,
-            "targetPeriodMonths": settings.target_period_months,
-        },
+                "targetWeight": settings.target_weight,
+                "targetPeriodMonths": settings.target_period_months,
+            },
             preference={
                 "dislikedFoods": settings.disliked_foods,
                 "allergies": settings.allergies,

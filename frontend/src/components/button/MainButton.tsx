@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 
 interface MainButtonProps {
   variant: 'primary' | 'destructive'
@@ -33,14 +34,17 @@ export default function MainButton({
     }
   }
 
+  const isLoading = disabled || pending
+
   return (
     <Button
       variant="outline"
       size="lg"
       onClick={handleClick}
-      disabled={disabled || pending}
-      className={cn('flex-1 bg-muted/80', variantStyles[variant])}
+      disabled={isLoading}
+      className={cn('flex-1 bg-muted/80 gap-2', variantStyles[variant])}
     >
+      {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
       {label}
     </Button>
   )

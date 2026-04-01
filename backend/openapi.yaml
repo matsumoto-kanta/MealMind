@@ -143,7 +143,7 @@ paths:
       tags:
         - meals
       summary: 献立生成
-      description: AIを使用して新しい献立を生成する
+      description: AIを使用して新しい献立を生成する。初期設定と月間予算の設定が完了している必要がある。
       operationId: generateMeals
       responses:
         '201':
@@ -157,6 +157,25 @@ paths:
                 properties:
                   meals:
                     $ref: '#/components/schemas/MealData'
+        '400':
+          description: 初期設定未完了または予算未設定
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                settingsIncomplete:
+                  summary: 初期設定未完了
+                  value:
+                    error:
+                      status: 400
+                      messages: 初期設定を完了してください
+                budgetNotSet:
+                  summary: 予算未設定
+                  value:
+                    error:
+                      status: 400
+                      messages: 月間予算を設定してください
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -301,7 +320,7 @@ paths:
       tags:
         - budget
       summary: 月間予算更新
-      description: 月間予算を更新する
+      description: 月間予算を更新する。初期設定が完了している必要がある。
       operationId: updateMonthlyBudget
       requestBody:
         required: true
@@ -328,6 +347,16 @@ paths:
                 properties:
                   monthlyBudget:
                     $ref: '#/components/schemas/MonthlyBudgetData'
+        '400':
+          description: 初期設定未完了
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  status: 400
+                  messages: 初期設定を完了してください
         '401':
           $ref: '#/components/responses/Unauthorized'
         '422':

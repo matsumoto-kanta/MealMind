@@ -1,4 +1,3 @@
-import { messages } from '@/constants/messages'
 import {
   Dialog,
   DialogContent,
@@ -6,37 +5,48 @@ import {
   DialogFooter,
   DialogTitle,
 } from '../ui/dialog'
-import { Handshake } from 'lucide-react'
+import { LucideIcon } from 'lucide-react'
 import MainButton from '../button/MainButton'
 
-interface SetUpPopupProps {
+interface InfoPopupProps {
   open: boolean
-  setOpen: (value: boolean) => void
+  onConfirm: () => void
+  title: string
+  description: string
+  buttonLabel: string
+  icon: LucideIcon
 }
 
-export default function SetUpPopup({ open, setOpen }: SetUpPopupProps) {
+export default function InfoPopup({
+  open,
+  onConfirm,
+  title,
+  description,
+  buttonLabel,
+  icon: Icon,
+}: InfoPopupProps) {
   return (
-    <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
+    <Dialog open={open}>
       <DialogContent
         className="rounded-2xl max-w-100.5!"
         showCloseButton={false}
       >
         <div className="flex flex-col items-center gap-4">
-          <Handshake className="size-10" />
+          <Icon className="size-10" />
 
           <DialogTitle className="text-[24px] font-semibold">
-            {messages.settings.popup.title}
+            {title}
           </DialogTitle>
 
           <DialogDescription className="text-[14px] text-center text-muted-foreground whitespace-pre-wrap">
-            {messages.settings.popup.description}
+            {description}
           </DialogDescription>
 
           <DialogFooter className="w-full pt-4">
             <MainButton
               variant="primary"
-              label={messages.settings.popup.button}
-              onClick={() => setOpen(false)}
+              label={buttonLabel}
+              onClick={onConfirm}
             ></MainButton>
           </DialogFooter>
         </div>

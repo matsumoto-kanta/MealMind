@@ -8,14 +8,18 @@ import MealCards from './card/MealCards'
 import MealEditDrawer from './drawer/MealEditDrawer'
 import useOpenCards from '@/hooks/useOpenCards'
 import { postGenerateMeals } from '@/lib/api/dashboard/postGenerateMeals'
+import { putConfirmed } from '@/lib/api/dashboard/putConfirmed'
+import { useAtom } from 'jotai'
+import { isGeneratingAtom } from '@/stores/LoadingStore'
 
 interface DashboardProps {
-  meals: MealData | null
+  meals: MealData
 }
 
 export default function Dashboard({ meals }: DashboardProps) {
   const router = useRouter()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isGenerating, setIsGenerating] = useAtom(isGeneratingAtom)
   const {
     openCardIds,
     showCheck,
@@ -27,9 +31,11 @@ export default function Dashboard({ meals }: DashboardProps) {
     handleConfirmed,
     confirmedCardIds,
     regeneratedCardIds,
+    regeneratedMealsData,
     hasRegeneratedRef,
     resetConfirmedCardIds,
-  } = useOpenCards({ meals: meals ?? undefined })
+    loadingCardId,
+  } = useOpenCards({ meals: meals.detail.length > 0 ? meals : undefined })
 
   const handleDrawerOpenChange = useCallback(
     (open: boolean) => {
@@ -46,17 +52,24 @@ export default function Dashboard({ meals }: DashboardProps) {
   )
 
   const handleEditOpen = useCallback(async () => {
-    if (meals) {
+    if (meals.detail.length > 0) {
       setDrawerOpen(true)
       return
     }
 
-    const result = await postGenerateMeals()
-    if (result) {
-      await router.refresh()
-      setDrawerOpen(true)
+    setIsGenerating(true)
+    try {
+      const result = await postGenerateMeals()
+      if (result) {
+        // すべてのmealを自動確定
+        await Promise.all(result.detail.map((meal) => putConfirmed(meal.id)))
+        router.refresh()
+        setDrawerOpen(true)
+      }
+    } finally {
+      setIsGenerating(false)
     }
-  }, [meals, router])
+  }, [meals, router, setIsGenerating])
 
   // 全カード確定時にDrawerを自動クローズ
   useEffect(() => {
@@ -80,9 +93,10 @@ export default function Dashboard({ meals }: DashboardProps) {
         onEditOpen={handleEditOpen}
         handleClick={handleClick}
         openCardIds={openCardIds}
+        isGenerating={isGenerating}
       />
 
-      {meals && (
+      {meals.detail.length > 0 && (
         <>
           <ShoppingList
             mealDetail={meals.detail}
@@ -102,6 +116,8 @@ export default function Dashboard({ meals }: DashboardProps) {
             openCardIds={openCardIds}
             confirmedCardIds={confirmedCardIds}
             regeneratedCardIds={regeneratedCardIds}
+            regeneratedMealsData={regeneratedMealsData}
+            loadingCardId={loadingCardId}
           />
         </>
       )}
