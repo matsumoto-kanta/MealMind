@@ -68,6 +68,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env.production file
+        run: |
+          cat > frontend/.env.production << EOF
+          NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app
+          EOF
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -83,7 +89,6 @@ jobs:
             --platform managed \
             --region ${{ env.GCP_REGION }} \
             --allow-unauthenticated \
-            --update-build-env-vars "NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app" \
             --memory 512Mi \
             --cpu 1 \
             --timeout 300 \
