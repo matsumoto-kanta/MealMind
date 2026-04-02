@@ -17,7 +17,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # 全ファイルをコピー（.env.productionを含む）
 COPY . .
 
-# 環境変数（ビルド時に必要な場合）
+# ビルド時の環境変数を受け取る
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Next.jsアプリケーションをビルド
