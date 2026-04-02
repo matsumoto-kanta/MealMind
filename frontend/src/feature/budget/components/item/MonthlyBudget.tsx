@@ -39,15 +39,14 @@ export default function MonthlyBudget({
     monthlyBudget.todayBudget,
     Math.max(remaining, 0)
   )
-  const remainingExceptToday = Math.max(remaining - todayBudget, 0)
 
   // グラフデータ: 残り → 今日の予算 → 使用済みの順で表示
   const chartData = isOverBudget
     ? [{ name: 'spent', value: 1 }]
     : [
-        { name: 'remaining', value: remainingExceptToday },
+        { name: 'remaining', value: remaining },
         { name: 'todayBudget', value: todayBudget },
-        { name: 'spent', value: spent },
+        { name: 'spent', value: spent - todayBudget },
       ]
 
   // グラフの各セグメントの色
@@ -129,7 +128,7 @@ export default function MonthlyBudget({
           <div className="flex items-center gap-2">
             <span className="h-3.5 w-3.5 rounded-[5px] bg-(--spent)" />
             <span className="text-[13px] whitespace-nowrap">
-              {messages.budget.legendSpent}
+              {`${messages.budget.legendSpent} ¥${Math.max(0, spent - todayBudget).toLocaleString()}`}
             </span>
           </div>
         </div>

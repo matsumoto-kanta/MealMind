@@ -55,7 +55,11 @@ export default function MealCards({
           <div>
             <MainButton
               variant="primary"
-              label={messages.dashboard.generateMenu}
+              label={
+                isGenerating
+                  ? messages.dashboard.generating
+                  : messages.dashboard.generateMenu
+              }
               onClick={onEditOpen}
               disabled={isGenerating}
             />
