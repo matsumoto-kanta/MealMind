@@ -68,9 +68,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create .env.production file
+      - name: Create .env.production.local file
         run: |
-          cat > frontend/.env.production << EOF
+          cat > frontend/.env.production.local << EOF
           NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app
           EOF
 

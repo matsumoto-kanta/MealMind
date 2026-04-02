@@ -1,0 +1,52 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore.
+
+.gcloudignore
+.git
+.gitignore
+
+# Python cache and build files:
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments:
+venv/
+ENV/
+env/
+
+# Test and development files:
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+
+# Documentation:
+README.md
+*.md
+
+# Environment files - EXCEPT .env.production which we need!
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+
+# Note: .env.production is NOT ignored because it's needed for deployment

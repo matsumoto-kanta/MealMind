@@ -42,13 +42,17 @@ echo "1. Dockerイメージをビルド & デプロイ..."
 # 環境変数の読み込み
 source .env.production
 
-# Cloud Buildでビルド時に環境変数を渡す
+# .env.production.local を作成（ビルド時に使用される）
+cat > .env.production.local << EOF
+NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+EOF
+
+# Cloud Runにデプロイ（.env.production.localがビルド時に読み込まれる）
 gcloud run deploy $SERVICE_NAME \
   --source . \
   --platform managed \
   --region $REGION \
   --allow-unauthenticated \
-  --update-build-env-vars "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" \
   --memory 512Mi \
   --cpu 1 \
   --timeout 300 \

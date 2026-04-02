@@ -12,7 +12,8 @@ if (process.env.MSW_ENABLED === 'true') {
   })
 }
 
-const API_BASE_URL = process.env.API_BASE_URL
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 interface QueryParams {
   [key: string]: string | number | boolean | string[] | number[]

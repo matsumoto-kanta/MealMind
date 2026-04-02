@@ -1,7 +1,8 @@
 import { MonthlyBudgetData } from '@/types/Budget'
 import { http, HttpResponse } from 'msw'
 
-const API_BASE_URL = process.env.API_BASE_URL
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 let monthlyBudget: MonthlyBudgetData = {
   monthlyBudget: 20000,

@@ -1,0 +1,40 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+#
+# For more information, run:
+#   $ gcloud topic gcloudignore
+#
+.gcloudignore
+.git
+.gitignore
+
+# Node.js dependencies:
+node_modules/
+
+# Build outputs (will be rebuilt in Cloud Build):
+.next/
+out/
+dist/
+
+# Test and development files:
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage/
+
+# Documentation:
+README.md
+*.md
+
+# Environment files - EXCEPT .env.production.local which we need for build!
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+
+# Note: .env.production and .env.production.local are NOT ignored
+# because they are needed during the Docker build process
