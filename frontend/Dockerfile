@@ -22,10 +22,8 @@ ARG NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# デバッグ用：環境変数を表示
-RUN echo "=== Build environment ===" && \
-    echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" && \
-    ls -la .env* 2>/dev/null || echo "No .env files found"
+# ビルド時の環境変数を確認（オプション）
+RUN echo "Building with NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}"
 
 # Next.jsアプリケーションをビルド
 RUN npm run build

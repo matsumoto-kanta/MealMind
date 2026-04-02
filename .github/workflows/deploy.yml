@@ -68,16 +68,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create .env.production.local file
-        run: |
-          cat > frontend/.env.production.local << EOF
-          NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app
-          EOF
-          echo "=== Verify .env.production.local was created ==="
-          ls -la frontend/.env.production.local
-          cat frontend/.env.production.local
-          echo "=== End verification ==="
-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
