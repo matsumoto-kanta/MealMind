@@ -1,0 +1,95 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GCP_PROJECT_ID: mealmind-491802
+  GCP_REGION: asia-northeast1
+  BACKEND_SERVICE: mealmind-backend
+  FRONTEND_SERVICE: mealmind-frontend
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.BACKEND_SERVICE }} \
+            --source ./backend \
+            --platform managed \
+            --region ${{ env.GCP_REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars "ENVIRONMENT=production" \
+            --set-env-vars "DATABASE_URL=postgresql+psycopg2://dbuser:${{ secrets.DB_PASSWORD }}@/mealmind?host=/cloudsql/${{ env.GCP_PROJECT_ID }}:${{ env.GCP_REGION }}:mealmind-db" \
+            --set-env-vars "CLOUD_SQL_CONNECTION_NAME=${{ env.GCP_PROJECT_ID }}:${{ env.GCP_REGION }}:mealmind-db" \
+            --set-env-vars "DB_USER=dbuser" \
+            --set-env-vars "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+            --set-env-vars "DB_NAME=mealmind" \
+            --set-env-vars "SECRET_KEY=${{ secrets.SECRET_KEY }}" \
+            --set-env-vars "ALGORITHM=HS256" \
+            --set-env-vars "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
+            --set-env-vars "GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }}" \
+            --set-env-vars "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --set-env-vars "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --set-env-vars "GOOGLE_REDIRECT_URI=https://mealmind-frontend-722464553476.asia-northeast1.run.app/auth/google/callback" \
+            --set-env-vars "FRONTEND_URL=https://mealmind-frontend-722464553476.asia-northeast1.run.app" \
+            --add-cloudsql-instances ${{ env.GCP_PROJECT_ID }}:${{ env.GCP_REGION }}:mealmind-db \
+            --memory 512Mi \
+            --cpu 1 \
+            --timeout 300 \
+            --max-instances 10 \
+            --min-instances 0
+
+      - name: Show deployment URL
+        run: |
+          echo "Backend deployed to: https://mealmind-backend-722464553476.asia-northeast1.run.app"
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
+            --source ./frontend \
+            --platform managed \
+            --region ${{ env.GCP_REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars "NEXT_PUBLIC_API_URL=https://mealmind-backend-722464553476.asia-northeast1.run.app" \
+            --memory 512Mi \
+            --cpu 1 \
+            --timeout 300 \
+            --max-instances 10 \
+            --min-instances 0
+
+      - name: Show deployment URL
+        run: |
+          echo "Frontend deployed to: https://mealmind-frontend-722464553476.asia-northeast1.run.app"

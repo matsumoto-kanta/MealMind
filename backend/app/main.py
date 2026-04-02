@@ -16,9 +16,12 @@ app = FastAPI(
 )
 
 # CORS設定
+from app.core.config import settings as config_settings
+
 origins = [
     "http://localhost:3000",  # Next.js開発サーバー
     "http://localhost:8000",
+    config_settings.FRONTEND_URL,  # 本番環境のフロントエンドURL
 ]
 
 
