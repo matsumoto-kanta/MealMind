@@ -57,6 +57,9 @@ gcloud run deploy $SERVICE_NAME \
   --set-env-vars "GEMINI_API_KEY=$GEMINI_API_KEY" \
   --set-env-vars "FRONTEND_URL=$FRONTEND_URL" \
   --set-env-vars "GCP_PROJECT_ID=$GCP_PROJECT_ID" \
+  --set-env-vars "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
+  --set-env-vars "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" \
+  --set-env-vars "GOOGLE_REDIRECT_URI=$GOOGLE_REDIRECT_URI" \
   --add-cloudsql-instances $CLOUD_SQL_CONNECTION_NAME \
   --memory 512Mi \
   --cpu 1 \
