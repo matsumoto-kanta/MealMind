@@ -88,12 +88,12 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
+          cd frontend
           gcloud run deploy ${{ env.FRONTEND_SERVICE }} \
-            --source ./frontend \
+            --source . \
             --platform managed \
             --region ${{ env.GCP_REGION }} \
             --allow-unauthenticated \
-            --update-build-env-vars "NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app" \
             --memory 512Mi \
             --cpu 1 \
             --timeout 300 \

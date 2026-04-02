@@ -17,13 +17,15 @@ COPY --from=deps /app/node_modules ./node_modules
 # 全ファイルをコピー（.env.productionを含む）
 COPY . .
 
-# 環境変数（ビルド時に必要な場合）
+# ビルド時の引数を受け取る
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# デバッグ用：.env ファイルの内容を表示
+# デバッグ用：環境変数を表示
 RUN echo "=== Build environment ===" && \
-    ls -la .env* 2>/dev/null || echo "No .env files found" && \
-    cat .env.production.local 2>/dev/null || echo "No .env.production.local"
+    echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" && \
+    ls -la .env* 2>/dev/null || echo "No .env files found"
 
 # Next.jsアプリケーションをビルド
 RUN npm run build
