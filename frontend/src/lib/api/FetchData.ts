@@ -80,11 +80,20 @@ export async function fetchData(
     const response = await fetch(url.toString(), fetchOptions)
 
     if (!response.ok) {
+      // レスポンスボディからdetailメッセージを取得（存在する場合）
+      let errorDetail: string | null = null
+      try {
+        const errorBody = await response.json()
+        errorDetail = errorBody?.detail || null
+      } catch {
+        // JSONパースに失敗した場合は無視
+      }
+
       if (response.status === ERROR_STATUS.UNAUTHORIZED) {
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.unauthorized,
+            messages: errorDetail || messages.common.errorMessage.unauthorized,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -95,7 +104,7 @@ export async function fetchData(
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.forbidden,
+            messages: errorDetail || messages.common.errorMessage.forbidden,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -106,7 +115,7 @@ export async function fetchData(
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.notFound,
+            messages: errorDetail || messages.common.errorMessage.notFound,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -117,7 +126,7 @@ export async function fetchData(
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.conflict,
+            messages: errorDetail || messages.common.errorMessage.conflict,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -128,7 +137,8 @@ export async function fetchData(
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.unprocessableEntity,
+            messages:
+              errorDetail || messages.common.errorMessage.unprocessableEntity,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -139,7 +149,8 @@ export async function fetchData(
         return {
           error: {
             status: response.status,
-            messages: messages.common.errorMessage.internalServerError,
+            messages:
+              errorDetail || messages.common.errorMessage.internalServerError,
             errorText: `Failed to fetch ${API_BASE_URL + path} ${
               response.status
             }`,
@@ -150,7 +161,7 @@ export async function fetchData(
       return {
         error: {
           status: response.status,
-          messages: messages.common.errorMessage.otherError,
+          messages: errorDetail || messages.common.errorMessage.otherError,
           errorText: `Failed to fetch ${API_BASE_URL + path} ${
             response.status
           }`,

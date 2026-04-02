@@ -1,6 +1,7 @@
 import json
 import google.generativeai as genai
 from typing import List, Dict, Any
+from google.api_core import exceptions as google_exceptions
 from app.core.config import settings
 from app.models.user_settings import GenderEnum, ActivityLevelEnum
 
@@ -50,8 +51,19 @@ class GeminiAIService:
             past_meal_names=past_meal_names,
         )
 
-        response = self.model.generate_content(prompt)
-        return self._parse_meal_response(response.text)
+        try:
+            response = self.model.generate_content(prompt)
+            return self._parse_meal_response(response.text)
+        except google_exceptions.ResourceExhausted:
+            raise ValueError(
+                "現在、AI献立生成サービスが混雑しています。しばらく時間をおいてから再度お試しください。"
+            )
+        except google_exceptions.TooManyRequests:
+            raise ValueError(
+                "リクエストが集中しています。しばらく時間をおいてから再度お試しください。"
+            )
+        except google_exceptions.GoogleAPIError as e:
+            raise ValueError(f"AI献立生成でエラーが発生しました: {str(e)}")
 
     def regenerate_single_meal(
         self,
@@ -97,9 +109,20 @@ class GeminiAIService:
             other_meals_today=other_meals_today,
         )
 
-        response = self.model.generate_content(prompt)
-        meals = self._parse_meal_response(response.text)
-        return meals[0] if meals else None
+        try:
+            response = self.model.generate_content(prompt)
+            meals = self._parse_meal_response(response.text)
+            return meals[0] if meals else None
+        except google_exceptions.ResourceExhausted:
+            raise ValueError(
+                "現在、AI献立生成サービスが混雑しています。しばらく時間をおいてから再度お試しください。"
+            )
+        except google_exceptions.TooManyRequests:
+            raise ValueError(
+                "リクエストが集中しています。しばらく時間をおいてから再度お試しください。"
+            )
+        except google_exceptions.GoogleAPIError as e:
+            raise ValueError(f"AI献立生成でエラーが発生しました: {str(e)}")
 
     def _build_daily_meal_prompt(
         self,
