@@ -144,7 +144,11 @@ export default function MealCard({
           <CardFooter className="flex gap-2 pt-4 px-2">
             <MainButton
               variant="destructive"
-              label={messages.dashboard.regeneration}
+              label={
+                isLoading
+                  ? messages.dashboard.regenerating
+                  : messages.dashboard.regeneration
+              }
               onClick={() => handleRegeneration(meal.id)}
               disabled={isLoading}
             />

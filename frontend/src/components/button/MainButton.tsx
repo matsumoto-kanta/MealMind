@@ -42,7 +42,10 @@ export default function MainButton({
       size="lg"
       onClick={handleClick}
       disabled={isLoading}
-      className={cn('flex-1 bg-muted/80 gap-2', variantStyles[variant])}
+      className={cn(
+        'flex-1 bg-muted/80 rounded-2xl text-[16px] font-medium shadow-sm gap-2',
+        variantStyles[variant]
+      )}
     >
       {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
       {label}

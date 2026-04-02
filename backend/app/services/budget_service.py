@@ -164,19 +164,28 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
     # - remainingMonthlyBudget: グラフ表示用に月間予算から使用済み金額を引いた額
     remaining_budget = max(0, current_record.monthly_budget - current_record.spent)
 
-    # 今日の献立が存在するかチェック（draft状態でも可）
+    # 今日の献立を取得
     today = date.today()
-    today_meals_exist = (
+    today_meals = (
         db.query(Meal)
         .filter(Meal.user_id == user_id, Meal.meal_date == today)
-        .first()
-        is not None
+        .all()
     )
 
-    # 献立が存在する場合のみ今日の予算を計算、存在しない場合は0
-    if today_meals_exist:
-        remaining_days = get_remaining_days_in_month()
-        today_budget = calculate_today_budget(remaining_budget, remaining_days)
+    # 今日の予算を計算
+    if today_meals:
+        # 今日の確定済み献立の合計コストを計算
+        today_confirmed_cost = sum(
+            meal.cost for meal in today_meals if meal.status == "confirmed"
+        )
+
+        # 確定済み献立がある場合は、その合計コストを today_budget とする
+        if today_confirmed_cost > 0:
+            today_budget = today_confirmed_cost
+        else:
+            # draft状態のみの場合は、残り予算から1日分の予算を計算
+            remaining_days = get_remaining_days_in_month()
+            today_budget = calculate_today_budget(remaining_budget, remaining_days)
     else:
         today_budget = 0
 
