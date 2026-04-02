@@ -17,8 +17,8 @@ COPY --from=deps /app/node_modules ./node_modules
 # 全ファイルをコピー（.env.productionを含む）
 COPY . .
 
-# ビルド時の引数を受け取る
-ARG NEXT_PUBLIC_API_URL
+# ビルド時の引数を受け取る（デフォルト値を設定）
+ARG NEXT_PUBLIC_API_URL=https://mealmind-backend-p5mpmtryka-an.a.run.app
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
 
