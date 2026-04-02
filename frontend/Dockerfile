@@ -16,8 +16,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# ビルド引数を定義
+ARG NEXT_PUBLIC_API_URL
+
 # 環境変数（ビルド時に必要な場合）
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
 # Next.jsアプリケーションをビルド
 RUN npm run build
