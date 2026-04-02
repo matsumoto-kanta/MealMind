@@ -14,10 +14,8 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+# 全ファイルをコピー（.env.productionを含む）
 COPY . .
-
-# .env.productionファイルをコピー
-COPY .env.production .env.production
 
 # 環境変数（ビルド時に必要な場合）
 ENV NEXT_TELEMETRY_DISABLED=1
