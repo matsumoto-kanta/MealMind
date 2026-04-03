@@ -89,82 +89,27 @@ export async function fetchData(
         // JSONパースに失敗した場合は無視
       }
 
-      if (response.status === ERROR_STATUS.UNAUTHORIZED) {
-        return {
-          error: {
-            status: response.status,
-            messages: errorDetail || messages.common.errorMessage.unauthorized,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
+      // ステータスコードとエラーメッセージのマッピング
+      const errorMessageMap: Record<number, string> = {
+        [ERROR_STATUS.UNAUTHORIZED]: messages.common.errorMessage.unauthorized,
+        [ERROR_STATUS.FORBIDDEN]: messages.common.errorMessage.forbidden,
+        [ERROR_STATUS.NOT_FOUND]: messages.common.errorMessage.notFound,
+        [ERROR_STATUS.CONFLICT]: messages.common.errorMessage.conflict,
+        [ERROR_STATUS.UNPROCESSABLE_ENTITY]:
+          messages.common.errorMessage.unprocessableEntity,
+        [ERROR_STATUS.INTERNAL_SERVER_ERROR]:
+          messages.common.errorMessage.internalServerError,
       }
-      if (response.status === ERROR_STATUS.FORBIDDEN) {
-        return {
-          error: {
-            status: response.status,
-            messages: errorDetail || messages.common.errorMessage.forbidden,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
-      }
-      if (response.status === ERROR_STATUS.NOT_FOUND) {
-        return {
-          error: {
-            status: response.status,
-            messages: errorDetail || messages.common.errorMessage.notFound,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
-      }
-      if (response.status === ERROR_STATUS.CONFLICT) {
-        return {
-          error: {
-            status: response.status,
-            messages: errorDetail || messages.common.errorMessage.conflict,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
-      }
-      if (response.status === ERROR_STATUS.UNPROCESSABLE_ENTITY) {
-        return {
-          error: {
-            status: response.status,
-            messages:
-              errorDetail || messages.common.errorMessage.unprocessableEntity,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
-      }
-      if (response.status === ERROR_STATUS.INTERNAL_SERVER_ERROR) {
-        return {
-          error: {
-            status: response.status,
-            messages:
-              errorDetail || messages.common.errorMessage.internalServerError,
-            errorText: `Failed to fetch ${API_BASE_URL + path} ${
-              response.status
-            }`,
-          },
-        }
-      }
+
+      const defaultMessage =
+        errorMessageMap[response.status] ||
+        messages.common.errorMessage.otherError
 
       return {
         error: {
           status: response.status,
-          messages: errorDetail || messages.common.errorMessage.otherError,
-          errorText: `Failed to fetch ${API_BASE_URL + path} ${
-            response.status
-          }`,
+          messages: errorDetail || defaultMessage,
+          errorText: `Failed to fetch ${API_BASE_URL + path} ${response.status}`,
         },
       }
     }
@@ -172,12 +117,8 @@ export async function fetchData(
     if (response.status === SUCCESS_STATUS.NO_CONTENT) {
       return {}
     }
-    const data = [
-      '/competitions/entries/template',
-      '/competitions/salse/export',
-    ].includes(path)
-      ? await response.text()
-      : await response.json()
+
+    const data = await response.json()
     return data
   } catch (error: unknown) {
     console.log('error', error)

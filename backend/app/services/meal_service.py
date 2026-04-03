@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 from uuid import UUID
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from calendar import monthrange
 from fastapi import HTTPException
 
@@ -185,7 +185,7 @@ class MealService:
             existing_meal.carbohydrates = meal_data["carbohydrates"]
             existing_meal.ingredients = meal_data["ingredients"]
             existing_meal.status = "draft"
-            existing_meal.updated_at = datetime.utcnow()
+            existing_meal.updated_at = datetime.now(timezone.utc)
             meal = existing_meal
         else:
             # 新規に作成
@@ -231,7 +231,7 @@ class MealService:
 
         # statusをconfirmedに変更
         meal.status = "confirmed"
-        meal.updated_at = datetime.utcnow()
+        meal.updated_at = datetime.now(timezone.utc)
 
         # 予算のspentを更新
         year_month = budget_service.get_current_year_month()

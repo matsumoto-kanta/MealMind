@@ -2,12 +2,15 @@
 FastAPI アプリケーションのメインエントリーポイント
 """
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 import yaml
 from pathlib import Path
+from sqlalchemy.orm import Session
 
 from app.routers import auth, settings, budget, meals, history
+from app.core.database import get_db
 
 app = FastAPI(
     title="MealMind API",
@@ -31,6 +34,16 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+# セッション管理ミドルウェア（CSRF対策用）
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config_settings.SESSION_SECRET_KEY,
+    session_cookie="session",
+    max_age=1800,  # 30分
+    same_site="lax",
+    https_only=True,  # 本番環境ではHTTPSのみ
 )
 
 
@@ -98,11 +111,19 @@ async def root():
 
 
 @app.get("/health")
-async def health_check():
+async def health_check(db: Session = Depends(get_db)):
     """
-    詳細なヘルスチェック
+    詳細なヘルスチェック（データベース接続確認含む）
     """
+    db_status = "disconnected"
+    try:
+        # データベース接続確認（簡単なクエリを実行）
+        db.execute("SELECT 1")
+        db_status = "connected"
+    except Exception:
+        db_status = "disconnected"
+
     return {
-        "status": "healthy",
-        "database": "not_configured",  # TODO: データベース接続確認
+        "status": "healthy" if db_status == "connected" else "degraded",
+        "database": db_status,
     }
