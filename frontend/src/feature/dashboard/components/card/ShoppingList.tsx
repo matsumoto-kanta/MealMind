@@ -67,12 +67,22 @@ export default function ShoppingList({
         {ingredientList.map((ing) => {
           const isChecked = checked[ing.name] ?? false
 
+          const handleToggleCheck = () => {
+            if (showCheck) {
+              setChecked((prev) => ({
+                ...prev,
+                [ing.name]: !isChecked,
+              }))
+            }
+          }
+
           return (
             <li
               key={ing.name}
+              onClick={handleToggleCheck}
               className={`grid items-center py-3 border-b border-muted-foreground/20 last:border-none transition-all duration-200 ${
                 showCheck
-                  ? 'grid-cols-[28px_1fr_144px_68px]'
+                  ? 'grid-cols-[28px_1fr_144px_68px] cursor-pointer'
                   : 'grid-cols-[1fr_144px_68px]'
               }`}
             >
@@ -85,7 +95,7 @@ export default function ShoppingList({
                       [ing.name]: Boolean(checked),
                     }))
                   }
-                  className="h-5 w-5 rounded-full data-[state=checked]:text-accent-foreground"
+                  className="h-5 w-5 rounded-full data-[state=checked]:text-accent-foreground pointer-events-none"
                 />
               )}
 

@@ -42,12 +42,12 @@ export default function InfoPopup({
             {description}
           </DialogDescription>
 
-          <DialogFooter className="w-full pt-4">
+          <DialogFooter className="w-full pt-4 flex-row">
             <MainButton
               variant="primary"
               label={buttonLabel}
               onClick={onConfirm}
-            ></MainButton>
+            />
           </DialogFooter>
         </div>
       </DialogContent>
