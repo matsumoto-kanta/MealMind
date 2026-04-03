@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
+import secrets
 
 from app.core.database import get_db
 from app.core.security import create_access_token
@@ -14,19 +15,24 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.get("/google")
-async def google_login():
+async def google_login(request: Request):
     """
     Google OAuth認証を開始します。
     Googleのログインページにリダイレクトします。
     """
-    # TODO: CSRF対策のためstateパラメータを実装
-    authorization_url = google_auth_service.get_authorization_url()
+    # CSRF対策: stateパラメータを生成してセッションに保存
+    state = secrets.token_urlsafe(32)
+    request.session["oauth_state"] = state
+
+    authorization_url = google_auth_service.get_authorization_url(state=state)
     return RedirectResponse(url=authorization_url)
 
 
 @router.get("/google/callback")
 async def google_callback(
     code: str,
+    state: str,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """
@@ -34,6 +40,16 @@ async def google_callback(
     認証コードを検証し、ユーザーを作成/取得してJWTトークンを発行します。
     """
     try:
+        # CSRF対策: stateパラメータを検証
+        saved_state = request.session.get("oauth_state")
+        if not saved_state or saved_state != state:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid state parameter. Possible CSRF attack.",
+            )
+
+        # セッションからstateを削除（一度きりの使用）
+        request.session.pop("oauth_state", None)
         # 認証コードを検証してユーザー情報を取得
         user_info = google_auth_service.verify_oauth_token(code)
 
@@ -51,11 +67,21 @@ async def google_callback(
             data={"sub": str(user.id), "email": user.email}
         )
 
-        # フロントエンドにリダイレクト（トークンをURLパラメータで渡す）
-        # コールバックエンドポイントでサーバーサイドでCookieを設定してから/mainにリダイレクト
+        # フロントエンドにリダイレクト（トークンはHTTP-only Cookieで設定）
         response = RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/auth/callback?token={access_token}",
+            url=f"{settings.FRONTEND_URL}/main",
             status_code=status.HTTP_302_FOUND,
+        )
+
+        # HTTP-only、Secure、SameSite属性付きのCookieでトークンを設定
+        response.set_cookie(
+            key="accessToken",
+            value=access_token,
+            httponly=True,  # JavaScriptからアクセス不可（XSS対策）
+            secure=True,  # HTTPS通信のみ（本番環境）
+            samesite="lax",  # CSRF対策
+            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # 秒単位
+            path="/",
         )
 
         return response

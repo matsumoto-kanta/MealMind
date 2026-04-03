@@ -1,13 +1,7 @@
 import { fetchData } from '../FetchData'
 import { MealDetailData } from '@/types/Meal'
-import { getDefaultStore } from 'jotai'
-import {
-  showToastAtom,
-  toastMessageAtom,
-  toastErrorMessageAtom,
-} from '@/stores/ToastStore'
-import { getErrorMessageByStatus } from '@/utils/getErrorMessageByStatus'
 import { messages } from '@/constants/messages'
+import { showSuccessToast, showErrorToast } from '@/utils/toast'
 
 /**
  * 献立再生成API
@@ -21,21 +15,11 @@ export const postRegeneration = async (
     method: 'POST',
   })
 
-  const store = getDefaultStore()
-
   if (response.error) {
-    store.set(
-      toastErrorMessageAtom,
-      response?.error?.messages ??
-        getErrorMessageByStatus(response?.error?.status)
-    )
-    store.set(toastMessageAtom, '')
-    store.set(showToastAtom, true)
+    showErrorToast(response.error)
     return null
   }
 
-  store.set(toastMessageAtom, messages.common.toastMessage.successRegeneration)
-  store.set(toastErrorMessageAtom, '')
-  store.set(showToastAtom, true)
+  showSuccessToast(messages.common.toastMessage.successRegeneration)
   return response.meal
 }
