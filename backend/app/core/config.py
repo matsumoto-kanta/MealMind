@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     # JWT
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24時間（60分 × 24時間）
 
     # Google OAuth
     GOOGLE_CLIENT_ID: str
