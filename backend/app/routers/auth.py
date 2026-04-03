@@ -70,14 +70,18 @@ async def google_callback(
         return response
 
     except ValueError as e:
+        print(f"ValueError in google_callback: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
     except Exception as e:
+        print(f"Exception in google_callback: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication failed",
+            detail=f"Authentication failed: {str(e)}",
         )
 
 
