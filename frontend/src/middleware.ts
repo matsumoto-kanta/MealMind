@@ -6,7 +6,7 @@ import type { NextRequest } from 'next/server'
  * 認証が必要なページへのアクセスを制御します
  */
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, searchParams } = request.nextUrl
   const accessToken = request.cookies.get('accessToken')
 
   // 認証が必要なパス (/main/* 配下)
@@ -15,8 +15,12 @@ export function middleware(request: NextRequest) {
   // ログインページ
   const isLoginPage = pathname === '/login'
 
+  // OAuthコールバック後のトークンパラメータをチェック
+  const hasTokenParam = searchParams.has('token')
+
   // 認証が必要なルートでトークンがない場合
-  if (isAuthRoute && !accessToken) {
+  // ただし、URLパラメータにトークンがある場合はスキップ（クライアント側でCookieを設定するため）
+  if (isAuthRoute && !accessToken && !hasTokenParam) {
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
