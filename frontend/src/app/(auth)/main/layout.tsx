@@ -12,12 +12,32 @@ import {
 import MainTab, { tabs } from '@/components/tab/MainTab'
 import { tabAtom } from '@/stores/TabStore'
 import { useAuthCheck } from '@/hooks/useAuthCheck'
+import { useSearchParams, useRouter } from 'next/navigation'
+import Cookies from 'js-cookie'
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  // URLパラメータからトークンを取得してCookieに保存
+  useEffect(() => {
+    const token = searchParams.get('token')
+    if (token) {
+      // Cookieにトークンを保存
+      Cookies.set('accessToken', token, {
+        expires: 1, // 1日
+        path: '/',
+        sameSite: 'lax',
+      })
+      // URLからトークンパラメータを削除
+      router.replace('/main')
+    }
+  }, [searchParams, router])
+
   // 認証状態を初期化
   useAuthCheck()
 

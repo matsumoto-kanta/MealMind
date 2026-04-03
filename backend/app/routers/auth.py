@@ -51,37 +51,24 @@ async def google_callback(
             data={"sub": str(user.id), "email": user.email}
         )
 
-        # フロントエンドにリダイレクトし、Cookieにトークンを設定
+        # フロントエンドにリダイレクト（トークンをURLパラメータで渡す）
+        # 異なるドメイン間ではCookieが共有できないため、URLパラメータを使用
         response = RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/main",
+            url=f"{settings.FRONTEND_URL}/main?token={access_token}",
             status_code=status.HTTP_302_FOUND,
-        )
-
-        # HTTPOnly Cookieを設定（セキュリティのため）
-        response.set_cookie(
-            key="accessToken",
-            value=access_token,
-            httponly=True,
-            secure=False,  # 開発環境ではFalse、本番ではTrue
-            samesite="lax",
-            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         )
 
         return response
 
     except ValueError as e:
-        print(f"ValueError in google_callback: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
     except Exception as e:
-        print(f"Exception in google_callback: {type(e).__name__}: {str(e)}")
-        import traceback
-        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Authentication failed: {str(e)}",
+            detail="Authentication failed",
         )
 
 
