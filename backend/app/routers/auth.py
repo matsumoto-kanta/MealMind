@@ -52,9 +52,9 @@ async def google_callback(
         )
 
         # フロントエンドにリダイレクト（トークンをURLパラメータで渡す）
-        # 異なるドメイン間ではCookieが共有できないため、URLパラメータを使用
+        # コールバックエンドポイントでサーバーサイドでCookieを設定してから/mainにリダイレクト
         response = RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/main?token={access_token}",
+            url=f"{settings.FRONTEND_URL}/auth/callback?token={access_token}",
             status_code=status.HTTP_302_FOUND,
         )
 
