@@ -50,8 +50,32 @@ app.add_middleware(
 # openapi.yaml から OpenAPI スキーマを読み込む
 def custom_openapi():
     # キャッシュをクリアして、常に YAML から読み込む
-    # openapi.yaml のパスを取得（/workspace/backend/openapi.yaml）
-    openapi_path = Path("/workspace/backend/openapi.yaml")
+    # openapi.yaml のパスを取得（相対パスまたは絶対パス）
+    # Dev Container: /workspace/backend/openapi.yaml
+    # Cloud Run: /app/openapi.yaml (Dockerfileの WORKDIR /app に基づく)
+    possible_paths = [
+        Path("/workspace/backend/openapi.yaml"),  # Dev Container
+        Path("/app/openapi.yaml"),  # Cloud Run
+        Path(__file__).parent.parent / "openapi.yaml",  # 相対パス
+    ]
+
+    openapi_path = None
+    for path in possible_paths:
+        if path.exists():
+            openapi_path = path
+            break
+
+    if openapi_path is None:
+        print("✗ openapi.yaml not found in any expected location")
+        # エラーの場合はデフォルトのスキーマを生成
+        from fastapi.openapi.utils import get_openapi
+
+        return get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+        )
 
     try:
         # YAML ファイルを読み込む

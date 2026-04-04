@@ -44,7 +44,133 @@
 
 - 食材内訳
 - PFC詳細
+- **レシピ（調理手順）** ← v2追加予定
 - 栄養コメント（将来）
+
+---
+
+# **レシピ機能（v2追加予定）**
+
+## **目的**
+
+- 献立を見て「何を作ればいいか」が分からない問題を解決
+- 調理手順を表示することで、実際に作れるようにする
+
+## **表示項目**
+
+### **各献立に追加する情報**
+
+- **調理手順（steps）**: 箇条書きで表示
+  - 例: 1. 鶏肉を一口大に切る / 2. フライパンで焼く...
+- **調理時間（cooking_time）**: 分単位で表示
+  - 例: 15分、30分
+- **難易度（difficulty）**: 3段階
+  - `easy` - 簡単（🟢）
+  - `medium` - 普通（🟡）
+  - `hard` - 難しい（🔴）
+
+## **UI表示方法**
+
+### **オプション1: アコーディオン（推奨）**
+- カードをタップすると、下に展開
+- 食材内訳とレシピをタブで切り替え
+
+### **オプション2: モーダル/ダイアログ**
+- 「レシピを見る」ボタンを追加
+- タップすると全画面でレシピ表示
+
+### **オプション3: 別ページ**
+- レシピ詳細ページに遷移
+
+## **データ取得方法**
+
+### **バックエンド実装**
+
+#### **AIプロンプトに追加**
+```
+各献立に以下の情報も含めてください：
+- 調理手順（5〜8ステップ程度）
+- 調理時間（分）
+- 難易度（easy/medium/hard）
+```
+
+#### **レスポンス形式（JSON）**
+```json
+{
+  "meals": [
+    {
+      "meal_type": "breakfast",
+      "name": "高タンパク和風オムレツ定食",
+      "kcal": 450,
+      "cost": 280,
+      "protein": 25,
+      "fat": 15,
+      "carbohydrates": 45,
+      "ingredients": [...],
+      "recipe": {
+        "steps": [
+          "卵を溶いて、塩コショウで味付けする",
+          "フライパンに油をひき、中火で熱する",
+          "卵液を流し込み、半熟になるまで焼く",
+          "ご飯と味噌汁を用意する",
+          "盛り付けて完成"
+        ],
+        "cooking_time": 15,
+        "difficulty": "easy"
+      }
+    }
+  ]
+}
+```
+
+#### **データベーススキーマ変更**
+`meals`テーブルに新しいカラム追加：
+```sql
+ALTER TABLE meals ADD COLUMN recipe JSON;
+```
+
+または、既存の`ingredients`カラム（JSON型）を拡張して`recipe`情報を含める
+
+#### **スキーマ変更（Pydantic）**
+```python
+# app/schemas/meal.py
+class RecipeData(BaseModel):
+    steps: List[str]
+    cooking_time: int  # 分
+    difficulty: Literal["easy", "medium", "hard"]
+
+class MealDetailData(BaseModel):
+    # ... 既存フィールド
+    recipe: RecipeData
+```
+
+### **フロントエンド実装**
+
+#### **型定義追加**
+```typescript
+// types/Meal.ts
+export interface Recipe {
+  steps: string[]
+  cooking_time: number
+  difficulty: 'easy' | 'medium' | 'hard'
+}
+
+export interface MealDetail {
+  // ... 既存フィールド
+  recipe: Recipe
+}
+```
+
+#### **コンポーネント追加**
+- `RecipeView.tsx` - レシピ表示コンポーネント
+- `MealCard` にレシピボタン追加
+
+## **将来の拡張機能**
+
+- お気に入りレシピの保存
+- レシピの検索・フィルタリング
+- 調理動画へのリンク（YouTube等）
+- ユーザー投稿レシピ
 
 ---
 

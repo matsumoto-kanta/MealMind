@@ -28,6 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app ./app
 COPY ./alembic ./alembic
 COPY ./alembic.ini ./alembic.ini
+COPY ./openapi.yaml ./openapi.yaml
 
 # 非rootユーザーを作成
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
