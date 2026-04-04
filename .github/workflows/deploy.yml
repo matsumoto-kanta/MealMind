@@ -42,7 +42,6 @@ jobs:
             --set-env-vars "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
             --set-env-vars "DB_NAME=mealmind" \
             --set-env-vars "SECRET_KEY=${{ secrets.SECRET_KEY }}" \
-            --set-env-vars "SESSION_SECRET_KEY=${{ secrets.SESSION_SECRET_KEY }}" \
             --set-env-vars "ALGORITHM=HS256" \
             --set-env-vars "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
             --set-env-vars "GCP_PROJECT_ID=${{ env.GCP_PROJECT_ID }}" \

@@ -10,9 +10,6 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 60分（1時間）
 
-    # Session
-    SESSION_SECRET_KEY: str  # セッション用の秘密鍵（JWTとは別）
-
     # Google OAuth
     GOOGLE_CLIENT_ID: str
     GOOGLE_CLIENT_SECRET: str

@@ -4,7 +4,6 @@ FastAPI アプリケーションのメインエントリーポイント
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 import yaml
 from pathlib import Path
 from sqlalchemy.orm import Session
@@ -34,16 +33,6 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)
-
-# セッション管理ミドルウェア（CSRF対策用）
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=config_settings.SESSION_SECRET_KEY,
-    session_cookie="session",
-    max_age=1800,  # 30分
-    same_site="lax",
-    https_only=True,  # 本番環境ではHTTPSのみ
 )
 
 

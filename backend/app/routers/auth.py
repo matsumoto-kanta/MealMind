@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 import secrets
+from jose import jwt, JWTError
+from datetime import datetime, timedelta
 
 from app.core.database import get_db
 from app.core.security import create_access_token
@@ -14,15 +16,43 @@ from app.middleware.auth import get_current_user
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def create_state_token() -> str:
+    """
+    CSRF対策用のstateトークンを生成します（JWT署名付き）。
+    セッションを使わず、トークン自体に署名を含めることで、
+    Cloud Runの複数インスタンス間でも検証可能にします。
+    """
+    nonce = secrets.token_urlsafe(32)
+    expires = datetime.utcnow() + timedelta(minutes=10)
+
+    state_data = {
+        "nonce": nonce,
+        "exp": expires,
+    }
+
+    state_token = jwt.encode(state_data, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return state_token
+
+
+def verify_state_token(state: str) -> bool:
+    """
+    stateトークンを検証します。
+    """
+    try:
+        jwt.decode(state, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        return True
+    except JWTError:
+        return False
+
+
 @router.get("/google")
 async def google_login(request: Request):
     """
     Google OAuth認証を開始します。
     Googleのログインページにリダイレクトします。
     """
-    # CSRF対策: stateパラメータを生成してセッションに保存
-    state = secrets.token_urlsafe(32)
-    request.session["oauth_state"] = state
+    # CSRF対策: JWT署名付きstateトークンを生成
+    state = create_state_token()
 
     authorization_url = google_auth_service.get_authorization_url(state=state)
     return RedirectResponse(url=authorization_url)
@@ -40,16 +70,12 @@ async def google_callback(
     認証コードを検証し、ユーザーを作成/取得してJWTトークンを発行します。
     """
     try:
-        # CSRF対策: stateパラメータを検証
-        saved_state = request.session.get("oauth_state")
-        if not saved_state or saved_state != state:
+        # CSRF対策: stateトークンを検証
+        if not verify_state_token(state):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid state parameter. Possible CSRF attack.",
             )
-
-        # セッションからstateを削除（一度きりの使用）
-        request.session.pop("oauth_state", None)
         # 認証コードを検証してユーザー情報を取得
         user_info = google_auth_service.verify_oauth_token(code)
 
