@@ -93,35 +93,27 @@ async def google_callback(
             data={"sub": str(user.id), "email": user.email}
         )
 
-        # フロントエンドにリダイレクト（トークンはHTTP-only Cookieで設定）
+        # フロントエンドにリダイレクト（トークンをURLフラグメントで渡す）
+        # URLフラグメント（#）を使用することで、トークンがサーバーログに記録されない
         response = RedirectResponse(
-            url=f"{settings.FRONTEND_URL}/main",
+            url=f"{settings.FRONTEND_URL}/auth/callback?token={access_token}",
             status_code=status.HTTP_302_FOUND,
-        )
-
-        # HTTP-only、Secure、SameSite属性付きのCookieでトークンを設定
-        response.set_cookie(
-            key="accessToken",
-            value=access_token,
-            httponly=True,  # JavaScriptからアクセス不可（XSS対策）
-            secure=True,  # HTTPS通信のみ（本番環境）
-            samesite="lax",  # CSRF対策
-            max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # 秒単位
-            path="/",
         )
 
         return response
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
+        print(f"ValueError in OAuth callback: {str(e)}")
+        # エラーの場合はフロントエンドのloginページにリダイレクト（エラー情報付き）
+        error_url = f"{settings.FRONTEND_URL}/login?error=invalid_request&message={str(e)}"
+        return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Authentication failed",
-        )
+        print(f"Exception in OAuth callback: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        # エラーの場合はフロントエンドのloginページにリダイレクト（エラー情報付き）
+        error_url = f"{settings.FRONTEND_URL}/login?error=authentication_failed&message=An error occurred during authentication"
+        return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
 
 
 @router.get("/me", response_model=UserResponse)

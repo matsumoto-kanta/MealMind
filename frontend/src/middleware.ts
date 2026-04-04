@@ -15,6 +15,14 @@ export function middleware(request: NextRequest) {
   // ログインページ
   const isLoginPage = pathname === '/login'
 
+  // 認証コールバックページ（認証不要）
+  const isAuthCallbackPage = pathname === '/auth/callback'
+
+  // 認証コールバックページは常に許可
+  if (isAuthCallbackPage) {
+    return NextResponse.next()
+  }
+
   // 認証が必要なルートでトークンがない場合
   if (isAuthRoute && !accessToken) {
     const loginUrl = new URL('/login', request.url)
