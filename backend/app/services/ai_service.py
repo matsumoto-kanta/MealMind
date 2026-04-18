@@ -3,7 +3,7 @@ import google.generativeai as genai
 from typing import List, Dict, Any
 from google.api_core import exceptions as google_exceptions
 from app.core.config import settings
-from app.models.user_settings import GenderEnum, ActivityLevelEnum
+from app.core.enums import GenderEnum, ActivityLevelEnum
 
 
 class GeminiAIService:
