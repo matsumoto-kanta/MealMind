@@ -29,20 +29,24 @@ def get_firestore_client() -> firestore.Client:
             # ローカル環境では認証ファイルを使用
             credentials_path = settings.FIRESTORE_CREDENTIALS_PATH
 
-            # Handle relative path
-            if not os.path.isabs(credentials_path):
-                # Resolve relative to backend directory
-                backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-                credentials_path = os.path.join(backend_dir, credentials_path)
+            if credentials_path:
+                # Handle relative path
+                if not os.path.isabs(credentials_path):
+                    # Resolve relative to backend directory
+                    backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+                    credentials_path = os.path.join(backend_dir, credentials_path)
 
-            # Initialize Firestore client
-            if os.path.exists(credentials_path):
-                credentials = service_account.Credentials.from_service_account_file(
-                    credentials_path
-                )
-                _db_instance = firestore.Client(credentials=credentials)
+                # Initialize Firestore client
+                if os.path.exists(credentials_path):
+                    credentials = service_account.Credentials.from_service_account_file(
+                        credentials_path
+                    )
+                    _db_instance = firestore.Client(credentials=credentials)
+                else:
+                    # Fallback to default credentials
+                    _db_instance = firestore.Client()
             else:
-                # Fallback to default credentials
+                # No credentials path specified, use default credentials
                 _db_instance = firestore.Client()
 
     return _db_instance

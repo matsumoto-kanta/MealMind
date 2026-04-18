@@ -26,9 +26,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./app ./app
 COPY ./openapi.yaml ./openapi.yaml
 
-# Firestore認証情報をコピー（ビルド時に必要）
-COPY ./firestore-key.json ./firestore-key.json
-
 # 非rootユーザーを作成
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
@@ -38,7 +35,6 @@ EXPOSE 8080
 
 # Cloud Run用の環境変数
 ENV PORT=8080
-ENV FIRESTORE_CREDENTIALS_PATH=/app/firestore-key.json
 
 # アプリケーションを起動
 CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}

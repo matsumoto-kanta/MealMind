@@ -4,7 +4,7 @@ from pydantic import ConfigDict
 
 class Settings(BaseSettings):
     # Firestore
-    FIRESTORE_CREDENTIALS_PATH: str
+    FIRESTORE_CREDENTIALS_PATH: str | None = None
 
     # Database (旧設定・移行後削除予定)
     DATABASE_URL: str | None = None
