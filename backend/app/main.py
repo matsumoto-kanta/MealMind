@@ -4,12 +4,12 @@ FastAPI アプリケーションのメインエントリーポイント
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from google.cloud import firestore
 import yaml
 from pathlib import Path
-from sqlalchemy.orm import Session
 
 from app.routers import auth, settings, budget, meals, history
-from app.core.database import get_db
+from app.core.firestore import get_db
 
 app = FastAPI(
     title="MealMind API",
@@ -124,16 +124,18 @@ async def root():
 
 
 @app.get("/health")
-async def health_check(db: Session = Depends(get_db)):
+async def health_check(db: firestore.Client = Depends(get_db)):
     """
     詳細なヘルスチェック（データベース接続確認含む）
     """
     db_status = "disconnected"
     try:
-        # データベース接続確認（簡単なクエリを実行）
-        db.execute("SELECT 1")
+        # Firestoreの接続確認（簡単なクエリを実行）
+        # usersコレクションを取得（件数0でも接続確認になる）
+        db.collection('users').limit(1).get()
         db_status = "connected"
-    except Exception:
+    except Exception as e:
+        print(f"Database health check failed: {e}")
         db_status = "disconnected"
 
     return {

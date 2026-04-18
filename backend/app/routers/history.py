@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from uuid import UUID
+from google.cloud import firestore
 
-from app.core.database import get_db
+from app.core.firestore import get_db
 from app.middleware.auth import get_current_user
 from app.schemas.meal import HistoryRequest, HistoryResponse
 from app.services.meal_service import MealService
@@ -14,13 +13,13 @@ router = APIRouter(prefix="/history", tags=["history"])
 def get_meal_history(
     request: HistoryRequest,
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     献立履歴を取得
     """
     try:
-        user_id = UUID(current_user["sub"])
+        user_id = current_user["sub"]
         meal_service = MealService(db)
         page = request.page if request.page is not None else 0
         history = meal_service.get_meal_history(user_id, page)

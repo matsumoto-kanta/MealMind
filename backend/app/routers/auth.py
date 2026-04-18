@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse, JSONResponse
-from sqlalchemy.orm import Session
+from google.cloud import firestore
 import secrets
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 
-from app.core.database import get_db
+from app.core.firestore import get_db
 from app.core.security import create_access_token
 from app.core.config import settings
 from app.services.google_auth import google_auth_service
@@ -63,7 +63,7 @@ async def google_callback(
     code: str,
     state: str,
     request: Request,
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     Google OAuth認証のコールバックエンドポイント。
@@ -90,7 +90,7 @@ async def google_callback(
 
         # JWTトークンを生成
         access_token = create_access_token(
-            data={"sub": str(user.id), "email": user.email}
+            data={"sub": str(user['id']), "email": user['email']}
         )
 
         # フロントエンドにリダイレクト（トークンをURLフラグメントで渡す）
@@ -119,7 +119,7 @@ async def google_callback(
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     現在ログイン中のユーザー情報を取得します。

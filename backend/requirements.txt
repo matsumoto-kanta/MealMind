@@ -1,22 +1,27 @@
-# FastAPI
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+# FastAPI (updated for Python 3.13 compatibility)
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+python-multipart>=0.0.20
 
-# Database
-sqlalchemy==2.0.25
-alembic==1.13.1
-psycopg2-binary==2.9.9
+# Firestore
+firebase-admin==6.5.0
 
-# Google Cloud
-cloud-sql-python-connector==1.20.1
+# Database (旧設定・移行後削除予定)
+# sqlalchemy==2.0.25
+# alembic==1.13.1
+# psycopg2-binary==2.9.9
+
+# Google Cloud (旧設定・移行後削除予定)
+# cloud-sql-python-connector==1.20.1
+
+# Google Cloud (認証関連は継続使用)
 google-auth==2.28.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
 
-# Pydantic
-pydantic==2.5.3
-pydantic-settings==2.1.0
+# Pydantic (updated for Python 3.13 compatibility)
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
 email-validator==2.1.0
 
 # Authentication & Security

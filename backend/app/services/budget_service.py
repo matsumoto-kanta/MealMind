@@ -1,10 +1,9 @@
-from sqlalchemy.orm import Session
-from typing import Optional, List
-from uuid import UUID
-from datetime import datetime, timedelta
+from google.cloud import firestore
+from typing import Optional, List, Dict, Any
+from datetime import datetime, timedelta, date
 from calendar import monthrange
 
-from app.models.monthly_budget import MonthlyBudget
+from app.repositories import MonthlyBudgetRepository, MealRepository
 from app.schemas.budget import MonthlyBudgetData, BudgetHistoryItem
 
 
@@ -19,52 +18,48 @@ def get_current_year_month() -> str:
 
 
 def get_monthly_budget_record(
-    db: Session, user_id: UUID, year_month: str
-) -> Optional[MonthlyBudget]:
+    db: firestore.Client, user_id: str, year_month: str
+) -> Optional[Dict[str, Any]]:
     """
     指定した年月の予算レコードを取得
 
     Args:
-        db: データベースセッション
+        db: Firestoreクライアント
         user_id: ユーザーID
         year_month: 年月 (YYYY-MM)
 
     Returns:
-        MonthlyBudgetモデルのインスタンス、または存在しない場合はNone
+        予算データ（辞書形式）、または存在しない場合はNone
     """
-    return (
-        db.query(MonthlyBudget)
-        .filter(
-            MonthlyBudget.user_id == user_id, MonthlyBudget.year_month == year_month
-        )
-        .first()
-    )
+    budget_repo = MonthlyBudgetRepository(db)
+    return budget_repo.get(user_id, year_month)
 
 
 def get_or_create_monthly_budget_record(
-    db: Session, user_id: UUID, year_month: str, budget: int = 0
-) -> MonthlyBudget:
+    db: firestore.Client, user_id: str, year_month: str, budget: int = 0
+) -> Dict[str, Any]:
     """
     指定した年月の予算レコードを取得、存在しない場合は作成
 
     Args:
-        db: データベースセッション
+        db: Firestoreクライアント
         user_id: ユーザーID
         year_month: 年月 (YYYY-MM)
         budget: 予算額（新規作成時のみ使用）
 
     Returns:
-        MonthlyBudgetモデルのインスタンス
+        予算データ（辞書形式）
     """
-    record = get_monthly_budget_record(db, user_id, year_month)
+    budget_repo = MonthlyBudgetRepository(db)
+    record = budget_repo.get(user_id, year_month)
 
     if not record:
-        record = MonthlyBudget(
-            user_id=user_id, year_month=year_month, monthly_budget=budget, spent=0
-        )
-        db.add(record)
-        db.commit()
-        db.refresh(record)
+        budget_data = {
+            'monthly_budget': budget,
+            'spent': 0,
+        }
+        budget_repo.create(user_id, year_month, budget_data)
+        record = budget_repo.get(user_id, year_month)
 
     return record
 
@@ -99,52 +94,46 @@ def get_remaining_days_in_month() -> int:
 
 
 def get_budget_history(
-    db: Session, user_id: UUID, limit: int = 6
+    db: firestore.Client, user_id: str, limit: int = 6
 ) -> List[BudgetHistoryItem]:
     """
     予算履歴を取得（最新N件）
 
     Args:
-        db: データベースセッション
+        db: Firestoreクライアント
         user_id: ユーザーID
         limit: 取得件数
 
     Returns:
         予算履歴のリスト
     """
-    records = (
-        db.query(MonthlyBudget)
-        .filter(MonthlyBudget.user_id == user_id)
-        .order_by(MonthlyBudget.year_month.desc())
-        .limit(limit)
-        .all()
-    )
+    budget_repo = MonthlyBudgetRepository(db)
+    records = budget_repo.list(user_id, limit=limit)
 
     return [
         BudgetHistoryItem(
-            year_month=record.year_month,
-            budget=record.monthly_budget,
-            spent=record.spent,
+            year_month=record['year_month'],
+            budget=record['monthly_budget'],
+            spent=record['spent'],
         )
         for record in records
     ]
 
 
-def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
+def get_monthly_budget_data(db: firestore.Client, user_id: str) -> MonthlyBudgetData:
     """
     月間予算データを取得
 
     Args:
-        db: データベースセッション
+        db: Firestoreクライアント
         user_id: ユーザーID
 
     Returns:
         月間予算データ
     """
-    from datetime import date
-    from app.models.meal import Meal
-
+    meal_repo = MealRepository(db)
     current_year_month = get_current_year_month()
+
     # GET APIではレコードを自動作成しない
     current_record = get_monthly_budget_record(db, user_id, current_year_month)
 
@@ -162,21 +151,17 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
     # NOTE: spentは献立確定時に累積加算していく（月替わりで自動リセット）
     # - 献立確定API: spentに加算
     # - remainingMonthlyBudget: グラフ表示用に月間予算から使用済み金額を引いた額
-    remaining_budget = max(0, current_record.monthly_budget - current_record.spent)
+    remaining_budget = max(0, current_record['monthly_budget'] - current_record['spent'])
 
     # 今日の献立を取得
     today = date.today()
-    today_meals = (
-        db.query(Meal)
-        .filter(Meal.user_id == user_id, Meal.meal_date == today)
-        .all()
-    )
+    today_meals = meal_repo.list_by_date(user_id, today)
 
     # 今日の予算を計算
     if today_meals:
         # 今日の確定済み献立の合計コストを計算
         today_confirmed_cost = sum(
-            meal.cost for meal in today_meals if meal.status == "confirmed"
+            meal['cost'] for meal in today_meals if meal['status'] == "confirmed"
         )
 
         # 確定済み献立がある場合は、その合計コストを today_budget とする
@@ -193,7 +178,7 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
     history = get_budget_history(db, user_id)
 
     return MonthlyBudgetData(
-        monthly_budget=current_record.monthly_budget,
+        monthly_budget=current_record['monthly_budget'],
         remaining_monthly_budget=remaining_budget,
         today_budget=today_budget,
         history=history,
@@ -201,28 +186,28 @@ def get_monthly_budget_data(db: Session, user_id: UUID) -> MonthlyBudgetData:
 
 
 def update_monthly_budget(
-    db: Session, user_id: UUID, new_budget: int
+    db: firestore.Client, user_id: str, new_budget: int
 ) -> MonthlyBudgetData:
     """
     月間予算を更新
 
     Args:
-        db: データベースセッション
+        db: Firestoreクライアント
         user_id: ユーザーID
         new_budget: 新しい予算額
 
     Returns:
         更新後の月間予算データ
     """
+    budget_repo = MonthlyBudgetRepository(db)
     current_year_month = get_current_year_month()
+
     record = get_or_create_monthly_budget_record(
         db, user_id, current_year_month, new_budget
     )
 
     # 予算を更新
-    record.monthly_budget = new_budget
-    db.commit()
-    db.refresh(record)
+    budget_repo.update(user_id, current_year_month, {'monthly_budget': new_budget})
 
     # 更新後のデータを返す
     return get_monthly_budget_data(db, user_id)

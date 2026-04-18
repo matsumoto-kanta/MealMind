@@ -58,6 +58,10 @@ logs/
 # Cloud SQL Proxy
 cloud-sql-proxy
 
+# Firebase/Firestore credentials
+firestore-key.json
+*-key.json
+
 # Alembic
 alembic/versions/*.pyc
 

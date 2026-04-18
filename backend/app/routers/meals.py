@@ -1,11 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from uuid import UUID
-from typing import List
+from google.cloud import firestore
 
-from app.core.database import get_db
+from app.core.firestore import get_db
 from app.middleware.auth import get_current_user
-from app.models.meal import MealTypeEnum, MealStatusEnum
 from app.schemas.meal import (
     MealResponse,
     MealDetailResponse,
@@ -21,29 +18,29 @@ router = APIRouter(prefix="/meals", tags=["meals"])
 @router.get("", response_model=MealResponse)
 def get_today_meals(
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     今日の確定済み献立を取得
     """
     try:
-        user_id = UUID(current_user["sub"])
+        user_id = current_user["sub"]
         meal_service = MealService(db)
         meals = meal_service.get_today_meals(user_id)
 
         # 献立をMealDetailDataに変換
         detail_list = [
             MealDetailData(
-                id=meal.meal_type,
-                name=meal.name,
-                kcal=meal.kcal,
-                cost=meal.cost,
-                protein=meal.protein,
-                fat=meal.fat,
-                carbohydrates=meal.carbohydrates,
-                status=meal.status,
+                id=meal['meal_type'],
+                name=meal['name'],
+                kcal=meal['kcal'],
+                cost=meal['cost'],
+                protein=meal['protein'],
+                fat=meal['fat'],
+                carbohydrates=meal['carbohydrates'],
+                status=meal['status'],
                 ingredients=[
-                    IngredientData(**ingredient) for ingredient in meal.ingredients
+                    IngredientData(**ingredient) for ingredient in meal['ingredients']
                 ],
             )
             for meal in meals
@@ -52,10 +49,16 @@ def get_today_meals(
         # 全体のステータスを判定（全てconfirmedならfixed、それ以外はdraft）
         overall_status = (
             "fixed"
-            if meals and all(m.status == "confirmed" for m in meals)
+            if meals and all(m['status'] == "confirmed" for m in meals)
             else "draft"
         )
-        meal_date = meals[0].meal_date if meals else None
+        meal_date = meals[0]['meal_date'] if meals else None
+
+        # Timestampをdateに変換
+        if meal_date:
+            from datetime import datetime
+            if isinstance(meal_date, datetime):
+                meal_date = meal_date.date()
 
         meal_data = MealData(
             status=overall_status,
@@ -76,19 +79,19 @@ def get_today_meals(
 @router.post("/generate", response_model=MealResponse)
 def generate_daily_meals(
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     1日分の献立を生成
     """
     try:
-        user_id = UUID(current_user["sub"])
+        user_id = current_user["sub"]
 
         # 設定が完了しているかチェック
         from app.services import settings_service, budget_service
 
         settings = settings_service.get_user_settings(db, user_id)
-        if not settings or settings.age == 0:
+        if not settings or settings['age'] == 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="初期設定を完了してください",
@@ -108,16 +111,16 @@ def generate_daily_meals(
         # 献立をMealDetailDataに変換
         detail_list = [
             MealDetailData(
-                id=meal.meal_type,
-                name=meal.name,
-                kcal=meal.kcal,
-                cost=meal.cost,
-                protein=meal.protein,
-                fat=meal.fat,
-                carbohydrates=meal.carbohydrates,
-                status=meal.status,
+                id=meal['meal_type'],
+                name=meal['name'],
+                kcal=meal['kcal'],
+                cost=meal['cost'],
+                protein=meal['protein'],
+                fat=meal['fat'],
+                carbohydrates=meal['carbohydrates'],
+                status=meal['status'],
                 ingredients=[
-                    IngredientData(**ingredient) for ingredient in meal.ingredients
+                    IngredientData(**ingredient) for ingredient in meal['ingredients']
                 ],
             )
             for meal in meals
@@ -126,10 +129,16 @@ def generate_daily_meals(
         # 全体のステータスを判定（全てconfirmedならfixed、それ以外はdraft）
         overall_status = (
             "fixed"
-            if meals and all(m.status == "confirmed" for m in meals)
+            if meals and all(m['status'] == "confirmed" for m in meals)
             else "draft"
         )
-        meal_date = meals[0].meal_date if meals else None
+        meal_date = meals[0]['meal_date'] if meals else None
+
+        # Timestampをdateに変換
+        if meal_date:
+            from datetime import datetime
+            if isinstance(meal_date, datetime):
+                meal_date = meal_date.date()
 
         meal_data = MealData(
             status=overall_status,
@@ -149,29 +158,29 @@ def generate_daily_meals(
 
 @router.post("/{id}/regenerate", response_model=MealDetailResponse)
 def regenerate_meal(
-    id: MealTypeEnum,
+    id: str,
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     指定した食事の献立を再生成
     """
     try:
-        user_id = UUID(current_user["sub"])
+        user_id = current_user["sub"]
         meal_service = MealService(db)
         meal = meal_service.regenerate_single_meal(user_id, id)
 
         detail = MealDetailData(
-            id=meal.meal_type,
-            name=meal.name,
-            kcal=meal.kcal,
-            cost=meal.cost,
-            protein=meal.protein,
-            fat=meal.fat,
-            carbohydrates=meal.carbohydrates,
-            status=meal.status,
+            id=meal['meal_type'],
+            name=meal['name'],
+            kcal=meal['kcal'],
+            cost=meal['cost'],
+            protein=meal['protein'],
+            fat=meal['fat'],
+            carbohydrates=meal['carbohydrates'],
+            status=meal['status'],
             ingredients=[
-                IngredientData(**ingredient) for ingredient in meal.ingredients
+                IngredientData(**ingredient) for ingredient in meal['ingredients']
             ],
         )
 
@@ -187,29 +196,29 @@ def regenerate_meal(
 
 @router.put("/{id}/confirm", response_model=MealDetailResponse)
 def confirm_meal(
-    id: MealTypeEnum,
+    id: str,
     current_user: dict = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    db: firestore.Client = Depends(get_db),
 ):
     """
     指定した食事の献立を確定
     """
     try:
-        user_id = UUID(current_user["sub"])
+        user_id = current_user["sub"]
         meal_service = MealService(db)
         meal = meal_service.confirm_meal(user_id, id)
 
         detail = MealDetailData(
-            id=meal.meal_type,
-            name=meal.name,
-            kcal=meal.kcal,
-            cost=meal.cost,
-            protein=meal.protein,
-            fat=meal.fat,
-            carbohydrates=meal.carbohydrates,
-            status=meal.status,
+            id=meal['meal_type'],
+            name=meal['name'],
+            kcal=meal['kcal'],
+            cost=meal['cost'],
+            protein=meal['protein'],
+            fat=meal['fat'],
+            carbohydrates=meal['carbohydrates'],
+            status=meal['status'],
             ingredients=[
-                IngredientData(**ingredient) for ingredient in meal.ingredients
+                IngredientData(**ingredient) for ingredient in meal['ingredients']
             ],
         )
 
