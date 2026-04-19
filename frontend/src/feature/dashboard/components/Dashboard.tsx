@@ -35,7 +35,7 @@ export default function Dashboard({ meals }: DashboardProps) {
     hasRegeneratedRef,
     resetConfirmedCardIds,
     loadingCardId,
-  } = useOpenCards({ meals: meals.detail.length > 0 ? meals : undefined })
+  } = useOpenCards({ meals: meals?.detail?.length > 0 ? meals : undefined })
 
   const handleDrawerOpenChange = useCallback(
     (open: boolean) => {
@@ -52,7 +52,7 @@ export default function Dashboard({ meals }: DashboardProps) {
   )
 
   const handleEditOpen = useCallback(async () => {
-    if (meals.detail.length > 0) {
+    if (meals?.detail?.length > 0) {
       setDrawerOpen(true)
       return
     }
@@ -75,8 +75,7 @@ export default function Dashboard({ meals }: DashboardProps) {
   useEffect(() => {
     if (
       drawerOpen &&
-      meals &&
-      meals.detail.length > 0 &&
+      meals?.detail?.length > 0 &&
       confirmedCardIds.size === meals.detail.length
     ) {
       const timer = setTimeout(() => {
@@ -96,7 +95,7 @@ export default function Dashboard({ meals }: DashboardProps) {
         isGenerating={isGenerating}
       />
 
-      {meals.detail.length > 0 && (
+      {meals?.detail?.length > 0 && (
         <>
           <ShoppingList
             mealDetail={meals.detail}

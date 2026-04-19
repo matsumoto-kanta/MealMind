@@ -63,8 +63,8 @@ export default function MealEditDrawer({
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 pb-6">
           <AnimatePresence>
-            {meals.detail
-              .filter((meal) => !confirmedCardIds.has(meal.id))
+            {meals?.detail
+              ?.filter((meal) => !confirmedCardIds.has(meal.id))
               .map((meal) => {
                 // 再生成されたmealのデータがあればそれを使用、なければオリジナルのデータを使用
                 const displayMeal = regeneratedMealsData.get(meal.id) || meal

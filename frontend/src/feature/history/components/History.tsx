@@ -104,7 +104,7 @@ export default function History({ history }: HistoryProps) {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar flex-col">
-                    {item.detail.map((meal) => (
+                    {item?.detail?.map((meal) => (
                       <div key={meal.id} className="snap-center">
                         <MealCard
                           status="fixed"

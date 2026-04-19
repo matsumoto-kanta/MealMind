@@ -22,7 +22,7 @@ export default function MealCards({
 }: MealCardsProps) {
   return (
     <div className="flex flex-col gap-5 text-foreground">
-      {meals.detail.length > 0 ? (
+      {meals?.detail?.length > 0 ? (
         <>
           <TitleAndButton
             title={messages.dashboard.todayMenu}
