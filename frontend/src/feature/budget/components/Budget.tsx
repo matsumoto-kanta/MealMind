@@ -14,7 +14,14 @@ interface BudgetProps {
 
 export default function Budget({ monthlyBudget }: BudgetProps) {
   const router = useRouter()
-  const [budgetData, setBudgetData] = useState<MonthlyBudgetData>(monthlyBudget)
+  const [budgetData, setBudgetData] = useState<MonthlyBudgetData>(
+    monthlyBudget || {
+      monthlyBudget: 0,
+      remainingMonthlyBudget: 0,
+      todayBudget: 0,
+      history: [],
+    }
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const handleSave = async (newBudget: number) => {
@@ -32,12 +39,12 @@ export default function Budget({ monthlyBudget }: BudgetProps) {
         onBudgetTap={() => setDrawerOpen(true)}
       />
 
-      <BudgetHistory budgetHistory={budgetData.history} />
+      <BudgetHistory budgetHistory={budgetData?.history || []} />
 
       <EditMonthlyBudgetDrawer
         open={drawerOpen}
         setOpen={setDrawerOpen}
-        currentBudget={budgetData.monthlyBudget}
+        currentBudget={budgetData?.monthlyBudget || 0}
         onSave={handleSave}
       />
     </div>

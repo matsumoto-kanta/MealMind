@@ -19,7 +19,7 @@ interface HistoryProps {
 
 export default function History({ history }: HistoryProps) {
   const PAGE_SIZE = 14
-  const [items, setItems] = useState<MealData[]>(history)
+  const [items, setItems] = useState<MealData[]>(history || [])
   const pageRef = useRef(0)
   const loadingRef = useRef(false)
   const [hasMore, setHasMore] = useState(true)

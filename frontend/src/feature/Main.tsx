@@ -30,12 +30,15 @@ export default function Main({
 
   // 設定未完了の判定（年齢、目標体重、目標達成期間がすべて1以上である必要がある）
   const isSettingsIncomplete =
-    settings?.profile?.age < 1 ||
-    settings?.goal?.targetWeight < 1 ||
-    settings?.goal?.targetPeriodMonths < 1
+    !settings?.profile?.age ||
+    settings.profile.age < 1 ||
+    !settings?.goal?.targetWeight ||
+    settings.goal.targetWeight < 1 ||
+    !settings?.goal?.targetPeriodMonths ||
+    settings.goal.targetPeriodMonths < 1
 
   // 予算未設定の判定
-  const isBudgetNotSet = monthlyBudget?.monthlyBudget === 0
+  const isBudgetNotSet = !monthlyBudget || monthlyBudget.monthlyBudget === 0
 
   // 設定未完了かつ設定タブ以外の場合、設定ポップアップを表示
   const settingsPopupOpen = isSettingsIncomplete && tab !== 'settings'
@@ -55,9 +58,18 @@ export default function Main({
   return (
     <>
       {tab === 'budget' ? (
-        <Budget monthlyBudget={monthlyBudget} />
+        <Budget
+          monthlyBudget={
+            monthlyBudget || {
+              monthlyBudget: 0,
+              remainingMonthlyBudget: 0,
+              todayBudget: 0,
+              history: [],
+            }
+          }
+        />
       ) : tab === 'history' ? (
-        <History history={history} />
+        <History history={history || []} />
       ) : tab === 'settings' ? (
         <Settings settings={settings} />
       ) : (
