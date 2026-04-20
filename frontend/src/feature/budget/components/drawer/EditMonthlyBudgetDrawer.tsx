@@ -4,28 +4,28 @@ import { useState } from 'react'
 import { messages } from '@/constants/messages'
 import { Input } from '@/components/ui/input'
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-} from '@/components/ui/drawer'
+  ModalSheet,
+  ModalSheetContent,
+  ModalSheetHeader,
+  ModalSheetTitle,
+  ModalSheetDescription,
+  ModalSheetFooter,
+} from '@/components/ui/modal-sheet'
 import MainButton from '@/components/button/MainButton'
 
-interface EditMonthlyBudgetDrawerProps {
+interface EditMonthlyBudgetModalSheetProps {
   open: boolean
   setOpen: (open: boolean) => void
   currentBudget: number
   onSave: (newBudget: number) => void
 }
 
-export default function EditMonthlyBudgetDrawer({
+export default function EditMonthlyBudgetModalSheet({
   open,
   setOpen,
   currentBudget,
   onSave,
-}: EditMonthlyBudgetDrawerProps) {
+}: EditMonthlyBudgetModalSheetProps) {
   const [value, setValue] = useState(String(currentBudget))
 
   const handleOpenChange = (open: boolean) => {
@@ -43,14 +43,14 @@ export default function EditMonthlyBudgetDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent className="mx-auto max-w-107.5">
-        <DrawerHeader className="py-6">
-          <DrawerTitle>{messages.budget.editBudget}</DrawerTitle>
-          <DrawerDescription className="sr-only">
+    <ModalSheet open={open} onOpenChange={handleOpenChange}>
+      <ModalSheetContent className="mx-auto max-w-107.5">
+        <ModalSheetHeader className="py-6">
+          <ModalSheetTitle>{messages.budget.editBudget}</ModalSheetTitle>
+          <ModalSheetDescription className="sr-only">
             {messages.budget.editBudget}
-          </DrawerDescription>
-        </DrawerHeader>
+          </ModalSheetDescription>
+        </ModalSheetHeader>
 
         <div className="px-4">
           <div className="relative">
@@ -72,14 +72,14 @@ export default function EditMonthlyBudgetDrawer({
           </div>
         </div>
 
-        <DrawerFooter className="py-6 flex-row">
+        <ModalSheetFooter className="py-6 flex-row">
           <MainButton
             variant="primary"
             label={messages.budget.save}
             onClick={handleSave}
           />
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </ModalSheetFooter>
+      </ModalSheetContent>
+    </ModalSheet>
   )
 }

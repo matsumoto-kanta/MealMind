@@ -3,30 +3,30 @@
 import { useState } from 'react'
 import { messages } from '@/constants/messages'
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-} from '@/components/ui/drawer'
+  ModalSheet,
+  ModalSheetContent,
+  ModalSheetHeader,
+  ModalSheetTitle,
+  ModalSheetDescription,
+  ModalSheetFooter,
+} from '@/components/ui/modal-sheet'
 import MainButton from '@/components/button/MainButton'
 import { PreferenceData } from '@/types/Settings'
 import TagInput from '../tag/TagInput'
 
-interface EditPreferenceDrawerProps {
+interface EditPreferenceModalSheetProps {
   open: boolean
   setOpen: (open: boolean) => void
   preference: PreferenceData
   onSave: (preference: PreferenceData) => void
 }
 
-export default function EditPreferenceDrawer({
+export default function EditPreferenceModalSheet({
   open,
   setOpen,
   preference,
   onSave,
-}: EditPreferenceDrawerProps) {
+}: EditPreferenceModalSheetProps) {
   const [dislikedFoods, setDislikedFoods] = useState<string[]>(
     preference.dislikedFoods
   )
@@ -45,14 +45,16 @@ export default function EditPreferenceDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent className="mx-auto max-w-107.5">
-        <DrawerHeader className="py-6">
-          <DrawerTitle>{messages.settings.preference.editTitle}</DrawerTitle>
-          <DrawerDescription className="sr-only">
+    <ModalSheet open={open} onOpenChange={handleOpenChange}>
+      <ModalSheetContent className="mx-auto max-w-107.5">
+        <ModalSheetHeader className="py-6">
+          <ModalSheetTitle>
             {messages.settings.preference.editTitle}
-          </DrawerDescription>
-        </DrawerHeader>
+          </ModalSheetTitle>
+          <ModalSheetDescription className="sr-only">
+            {messages.settings.preference.editTitle}
+          </ModalSheetDescription>
+        </ModalSheetHeader>
 
         <div className="px-4 flex flex-col gap-5">
           <TagInput
@@ -74,14 +76,14 @@ export default function EditPreferenceDrawer({
           />
         </div>
 
-        <DrawerFooter className="py-6 flex-row">
+        <ModalSheetFooter className="py-6 flex-row">
           <MainButton
             variant="primary"
             label={messages.settings.save}
             onClick={handleSave}
           />
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </ModalSheetFooter>
+      </ModalSheetContent>
+    </ModalSheet>
   )
 }

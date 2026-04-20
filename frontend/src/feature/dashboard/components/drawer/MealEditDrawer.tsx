@@ -2,15 +2,15 @@ import { messages } from '@/constants/messages'
 import { MealData, MealDetailData } from '@/types/Meal'
 import MealCard from '@/components/card/MealCard'
 import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer'
+  ModalSheet,
+  ModalSheetContent,
+  ModalSheetDescription,
+  ModalSheetHeader,
+  ModalSheetTitle,
+} from '@/components/ui/modal-sheet'
 import { AnimatePresence } from 'framer-motion'
 
-interface MealEditDrawerProps {
+interface MealEditModalSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   meals: MealData
@@ -24,7 +24,7 @@ interface MealEditDrawerProps {
   loadingCardId: string | null
 }
 
-export default function MealEditDrawer({
+export default function MealEditModalSheet({
   open,
   onOpenChange,
   meals,
@@ -36,11 +36,11 @@ export default function MealEditDrawer({
   regeneratedCardIds,
   regeneratedMealsData,
   loadingCardId,
-}: MealEditDrawerProps) {
+}: MealEditModalSheetProps) {
   // 再生成中はドロワーを閉じられないようにする
   const isRegenerating = loadingCardId !== null
 
-  const handleDrawerOpenChange = (open: boolean) => {
+  const handleModalSheetOpenChange = (open: boolean) => {
     // 再生成中でドロワーを閉じようとしている場合は無視
     if (!open && isRegenerating) {
       return
@@ -49,18 +49,18 @@ export default function MealEditDrawer({
   }
 
   return (
-    <Drawer
+    <ModalSheet
       open={open}
-      onOpenChange={handleDrawerOpenChange}
+      onOpenChange={handleModalSheetOpenChange}
       dismissible={!isRegenerating}
     >
-      <DrawerContent className="mx-auto max-w-107.5">
-        <DrawerHeader className="py-6">
-          <DrawerTitle>{messages.dashboard.todayMenu}</DrawerTitle>
-          <DrawerDescription className="sr-only">
+      <ModalSheetContent className="mx-auto max-w-107.5">
+        <ModalSheetHeader className="py-6">
+          <ModalSheetTitle>{messages.dashboard.todayMenu}</ModalSheetTitle>
+          <ModalSheetDescription className="sr-only">
             {messages.dashboard.todayMenu}
-          </DrawerDescription>
-        </DrawerHeader>
+          </ModalSheetDescription>
+        </ModalSheetHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 pb-6">
           <AnimatePresence>
             {meals?.detail
@@ -89,7 +89,7 @@ export default function MealEditDrawer({
               })}
           </AnimatePresence>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </ModalSheetContent>
+    </ModalSheet>
   )
 }

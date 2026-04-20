@@ -3,19 +3,19 @@
 import { useState } from 'react'
 import { messages } from '@/constants/messages'
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-} from '@/components/ui/drawer'
+  ModalSheet,
+  ModalSheetContent,
+  ModalSheetHeader,
+  ModalSheetTitle,
+  ModalSheetDescription,
+  ModalSheetFooter,
+} from '@/components/ui/modal-sheet'
 import MainButton from '@/components/button/MainButton'
 import { ProfileData, Gender, ActivityLevel } from '@/types/Settings'
 import UnitInput from '../input/UnitInput'
 import SegmentedControl from '../input/SegmentedControl'
 
-interface EditProfileDrawerProps {
+interface EditProfileModalSheetProps {
   open: boolean
   setOpen: (open: boolean) => void
   profile: ProfileData
@@ -34,12 +34,12 @@ const activityOptions: { value: ActivityLevel; label: string }[] = [
   { value: 'high', label: messages.settings.profile.activityHigh },
 ]
 
-export default function EditProfileDrawer({
+export default function EditProfileModalSheet({
   open,
   setOpen,
   profile,
   onSave,
-}: EditProfileDrawerProps) {
+}: EditProfileModalSheetProps) {
   const [gender, setGender] = useState<Gender>(profile.gender)
   const [age, setAge] = useState(String(profile.age))
   const [height, setHeight] = useState(String(profile.height))
@@ -82,14 +82,16 @@ export default function EditProfileDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      <DrawerContent className="mx-auto max-w-107.5">
-        <DrawerHeader className="py-6">
-          <DrawerTitle>{messages.settings.profile.editTitle}</DrawerTitle>
-          <DrawerDescription className="sr-only">
+    <ModalSheet open={open} onOpenChange={handleOpenChange}>
+      <ModalSheetContent className="mx-auto max-w-107.5">
+        <ModalSheetHeader className="py-6">
+          <ModalSheetTitle>
             {messages.settings.profile.editTitle}
-          </DrawerDescription>
-        </DrawerHeader>
+          </ModalSheetTitle>
+          <ModalSheetDescription className="sr-only">
+            {messages.settings.profile.editTitle}
+          </ModalSheetDescription>
+        </ModalSheetHeader>
 
         <div className="px-4 flex flex-col gap-5">
           {/* 性別 */}
@@ -137,14 +139,14 @@ export default function EditProfileDrawer({
           />
         </div>
 
-        <DrawerFooter className="py-6 flex-row">
+        <ModalSheetFooter className="py-6 flex-row">
           <MainButton
             variant="primary"
             label={messages.settings.save}
             onClick={handleSave}
           />
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </ModalSheetFooter>
+      </ModalSheetContent>
+    </ModalSheet>
   )
 }
