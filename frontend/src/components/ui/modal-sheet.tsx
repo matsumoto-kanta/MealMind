@@ -39,7 +39,10 @@ function ModalSheetContent({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <Sheet.Content data-slot="modal-sheet-content">
+    <Sheet.Content
+      style={{ backgroundColor: 'transparent' }}
+      data-slot="modal-sheet-content"
+    >
       <div
         className={cn(
           'flex h-full flex-col bg-background rounded-t-lg',
