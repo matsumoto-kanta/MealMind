@@ -45,13 +45,13 @@ export default function MainTab({ tab, onChange }: MainTabProps) {
         value={tab}
         onValueChange={(v) => !isAnyLoading && onChange(v as Tab)}
       >
-        <TabsList className="w-full h-21.5 bg-muted rounded-none">
+        <TabsList className="w-full h-21.5 rounded-none bg-white/10 dark:bg-slate-900/90 backdrop-blur-sm border-t border-white/20 dark:border-slate-700/50">
           {tabs.map(({ key, label, icon: Icon }) => (
             <TabsTrigger
               key={key}
               value={key}
               disabled={isAnyLoading && key !== tab}
-              className="flex-1 text-secondary-foreground data-[state=active]:text-primary-foreground dark:data-[state=active]:text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 text-secondary-foreground transition-all duration-300 data-[state=active]:bg-white/20 dark:data-[state=active]:bg-white/10 data-[state=active]:text-primary-foreground dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <TabItem
                 icon={
